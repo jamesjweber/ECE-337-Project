@@ -20,9 +20,7 @@ module s_box
 	always_comb
 	begin
 		for(i = 3; i < 128; i += 4)
-		begin
 			outData[i-:3] = sBlocks[sel][inData[i-:3]];
-		end
 	end
 
 endmodule
