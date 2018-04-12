@@ -16,6 +16,8 @@ module ahb_lite_slave_interface (
 	output wire [31:0] HRDATA
 );
 
-	
+always_ff @ (posedge HCLK, negedge HRESETn) begin
+	// Reset stuff
+end
 
 endmodule // ahb_lite_slave_interface
