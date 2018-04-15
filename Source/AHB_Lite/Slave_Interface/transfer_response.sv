@@ -27,28 +27,36 @@ always_comb begin
 
     TL: // Transfer Pending (Transfer Low)
     begin
+      // Set State
       next_state <= error ? ERR1 : ready ? TH : TL;
+      // Set Output
       HREADY = 1'b0;
       HRESP = 1'b0;
     end
 
     TH: // Successful Transfer (Transfer High)
     begin
+      // Set State
       next_state <= error ? ERR1 : ready ? TH : TL;
+      // Set Output
       HREADY = 1'b1;
       HRESP = 1'b0;
     end
 
     ERR1: // Error repsone, cycle 1
     begin
+      // Set State
       next_state <= ERR2;
+      // Set Output
       HREADY = 1'b0;
       HRESP = 1'b1;
     end
 
     ERR2: // Error repsone, cycle 1
     begin
+      // Set State
       next_state <= ready ? TH : TL;
+      // Set Output
       HREADY = 1'b1;
       HRESP = 1'b1;
     end
