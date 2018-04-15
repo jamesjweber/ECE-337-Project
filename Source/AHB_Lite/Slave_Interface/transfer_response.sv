@@ -12,7 +12,7 @@ typedef enum bit [1:0] {TL, TH, ERR1, ERR2} stateType;
   stateType next_state;
 
 always_ff @ (posedge HCLK, negedge HRESETn) begin
-  if (HRESETn == 0) begin
+  if (HRESETn == 1'b0) begin
     state <= TL;
   end else begin
     state <= next_state;
