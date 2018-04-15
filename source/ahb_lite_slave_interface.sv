@@ -16,6 +16,7 @@ module ahb_lite_slave_interface (
 	output wire [31:0] HRDATA
 );
 
+// Internal Signals
 output wire [127:0] SWDATA;
 
 size_control SC(HWDATA, HSIZE, SWDATA);
