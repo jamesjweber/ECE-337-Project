@@ -16,6 +16,10 @@ module ahb_lite_slave_interface (
 	output wire [31:0] HRDATA
 );
 
+output wire [127:0] SWDATA;
+
+size_control SC(HWDATA, HSIZE, SWDATA);
+
 always_ff @ (posedge HCLK, negedge HRESETn) begin
 	// Reset stuff
 end
