@@ -20,24 +20,32 @@ module ahb_lite_slave_interface (
 );
 
 // Internal Signals
-output wire [127:0] SWDATA;
-output wire sizeControlError;
-output wire readWriteError;
-output wire readWriteReady;
+wire [127:0] SWDATA;
+wire sizeControlError;
+wire readWriteError;
+wire readWriteReady;
 
-output wire error;
-output wire ready;
+wire enable;
+wire error;
+wire ready;
+
+reg [31:0] prevAddress;
 
 // Combining Signals
+assign enable = HSELx && HREADY;
 assign error = sizeControlError || readWriteError; // and future error signals
 assign ready = readWriteReady; // and future response signals
 
 // Internal Blocks
-transfer_response TR(HCLK, HRESETn, ready, error, HREADY, HRESP);
-size_control SC(HWDATA, HSIZE, SWDATA, sizeControlError);
+transfer_response TR(HCLK, HRESETn, HSELx, ready, error, HREADY, HRESP);
+size_control SC(HSLEx, HWDATA, HSIZE, SWDATA, sizeControlError);
 
-always_ff @ (posedge HCLK, negedge HRESETn) begin
-	// Reset stuff
+always_ff @ (negedge HCLK, negedge HRESETn) begin
+	if (HRESETn == 1'b1) begin
+		prevAddress <= 32'b0;
+	end else begin
+		prevAddress <= HADDR;
+	end
 end
 
 endmodule // ahb_lite_slave_interface
