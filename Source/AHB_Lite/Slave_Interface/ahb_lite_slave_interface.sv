@@ -6,25 +6,31 @@ module ahb_lite_slave_interface (
 	input wire HWRITE,
 	input wire [2:0] HSIZE,
 	input wire [2:0] HBURST,
-	input wire [3:0] HPROT,
 	input wire [1:0] HTRANS,
 	input wire HREADY,
 	input wire [128:0] HWDATA,
+	input wire fifoFull,
 	output reg HREADYOUT,
 	output reg HRESP,
-	output reg [31:0] HRDATA
+	output reg [128:0] HRDATA
+	output reg [128:0] key,
+	output reg [128:0] nonce,
+	output reg [128:0] destination,
+	output reg [128:0] plainText
 );
 
 // Internal Signals
 output wire [127:0] SWDATA;
 output wire sizeControlError;
+output wire readWriteError;
+output wire readWriteReady;
 
 output wire error;
 output wire ready;
 
 // Combining Signals
-assign error = sizeControlError; // & future error signals
-assign ready = 1'b1; // for right now
+assign error = sizeControlError || readWriteError; // and future error signals
+assign ready = readWriteReady; // and future response signals
 
 // Internal Blocks
 transfer_response TR(HCLK, HRESETn, ready, error, HREADY, HRESP);
