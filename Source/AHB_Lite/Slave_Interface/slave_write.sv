@@ -68,7 +68,7 @@ always_comb begin
   if (HREADY == 1'b1) begin
     next_state <= {HBURST, HTRANS}; // Set next state
   end else begin
-    //next_state <=
+    next_state <= state;
   end
 
   case (state)
