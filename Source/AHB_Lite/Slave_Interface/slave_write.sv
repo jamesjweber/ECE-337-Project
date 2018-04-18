@@ -18,8 +18,6 @@ module slave_write (
 
 // User Defined Types
 typedef enum bit [4:0] {S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19,S20,S21,S22,S23,S24,S25,S26,S27,S28,S29,S30,S31,S32} stateType;
-typedef enum bit [2:0] {SINGLE,INCR,WRAP4,INCR4,WRAP8,INCR8,WRAP16,INCR16} hburstType;
-typedef enum bit [1:0] {IDLE,BUSY,NONSEQ,SEQ} htransType;
 
 // Internal Signals
 stateType state;
@@ -34,16 +32,7 @@ reg [31:0] prev_HADDR;
 
 
 always_ff @ (posedge HCLK, negedge HRESETn) begin
-  if (HRESETn == 1'b0) begin
-    key <= 128'b0;
-    nonce <= 128'b0;
-    destination <= 128'b0;
-    plain_text <= 128'b0;
-    write_error <= 1'b0;
-    write_ready <= 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
-    prev_HADDR <= 32'b0;
-  end else begin
-    // Reset Signals as needed
+  if (HRESETn == 1'b0 && HSELx == 1'b1) begin // If selected and not being reset
     key <= next_key;
     nonce <= next_nonce;
     destination <= next_destination;
@@ -52,7 +41,18 @@ always_ff @ (posedge HCLK, negedge HRESETn) begin
     write_ready <= next_write_ready;
     state <= next_state;
     prev_HADDR <= HADDR;
+  end else begin // Else if being reset and/or not currently selected
+    key <= 128'b0;
+    nonce <= 128'b0;
+    destination <= 128'b0;
+    plain_text <= 128'b0;
+    state <= next_state;
+    write_error <= 1'b0;
+    write_ready <= 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
+    prev_HADDR <= 32'b0;
+  end
 end
+
 
 always_comb begin
 
@@ -62,13 +62,19 @@ always_comb begin
   next_plain_text <= plain_text;
   next_state <= state;
   next_write_error <= 1'b0;
+  next_write_ready <= 1'b1;
 
   // See slave_write.md (README) for description of all states
 
   if (HREADY == 1'b1) begin
     next_state <= {HBURST, HTRANS}; // Set next state
   end else begin
-    next_state <= state;
+    if (state == {HBURST,HTRANS}) begin
+      next_state <= {HBURST,HTRANS};
+    end else beign
+      next_state <= state;
+      next_write_error <= 1'b1;
+    end
   end
 
   case (state)
@@ -76,12 +82,7 @@ always_comb begin
     S1:
     begin
       // HBURST: SINGLE, HTRANS: IDLE
-      // Do not write data in IDLE state
-
-      // Check for invalid states
-      if (next_state == S2 || next_state == S4 || next_state == S6 || next_state == S8 || next_state == S10 || next_state == S12 || next_state == S14 || next_state == S16 || next_state == S18 || next_state == S20 || next_state == S22 || next_state == S24 || next_state == S26 || next_state == S28 || next_state == S30 || next_state == S32) begin
-        next_write_error <= 1'b1;
-      end // check for invalid next states
+      // Do not read data in IDLE state
     end
 
     S2:
@@ -108,16 +109,16 @@ always_comb begin
           next_destination <= SWDATA;
         end else if (prev_HADDR[7:0] = 1'h200) begin
           // Plain Text Address
-          next_plain_text <= SWDATA;
+          if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
+            next_plain_text <= SWDATA;
+          end else begin
+            next_write_ready <= 1'b0;
+          end
         end else begin
           // Invalid Address
           next_write_error <= 1'b1;
         end
       end
-
-      if (next_state == S2 || next_state == S4 || next_state == S6 || next_state == S8 || next_state == S10 || next_state == S12 || next_state == S14 || next_state == S16 || next_state == S18 || next_state == S20 || next_state == S22 || next_state == S24 || next_state == S26 || next_state == S28 || next_state == S30 || next_state == S32) begin
-        next_write_error <= 1'b1;
-      end // check for invalid next states
 
     end
 
@@ -133,146 +134,251 @@ always_comb begin
       // HBURST: INCR, HTRANS: IDLE
       // Do not write data in IDLE state
 
-      // Check for invalid states
-      if (next_state == S2 || next_state == S4 || next_state == S6 || next_state == S8 || next_state == S10 || next_state == S12 || next_state == S14 || next_state == S16 || next_state == S18 || next_state == S20 || next_state == S22 || next_state == S24 || next_state == S26 || next_state == S28 || next_state == S30 || next_state == S32) begin
-        next_write_error <= 1'b1;
-      end // check for invalid next states
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S6:
     begin
       // HBURST: INCR, HTRANS: BUSY
-      // Do not write data in IDLE state
+      // Do not write data in BUSY state.
+
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S7:
     begin
+      // HBURST: INCR, HTRANS: NONSEQ
+      // Beginning of INCR burst.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S8:
     begin
+      // HBURST: INCR, HTRANS: SEQ
+      // Continuation of burst from state S7
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S9:
     begin
+      // HBURST: WRAP4, HTRANS: IDLE
+      // Do not write data in IDLE state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S10:
     begin
+      // HBURST: WRAP4, HTRANS: BUSY
+      // Do not write data in BUSY state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S11:
     begin
+      // HBURST: WRAP4, HTRANS: NONSEQ
+      // Beginning of WRAP4 burst.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S12:
     begin
+      // HBURST: WRAP4, HTRANS: SEQ
+      // Continuation of burst from state S11.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S13:
     begin
+      // HBURST: INCR4, HTRANS: IDLE
+      // Do not write data in IDLE state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S14:
     begin
+      // HBURST: INCR4, HTRANS: BUSY
+      // Do not write data in BUSY state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S15:
     begin
+      // HBURST: INCR4, HTRANS: NONSEQ
+      // Beginning of INCR4 burst.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S16:
     begin
+      // HBURST: INCR4, HTRANS: SEQ
+      // Continuation of burst from state S15.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S17:
     begin
+      // HBURST: WRAP8, HTRANS: IDLE
+      // Do not write data in IDLE state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S18:
     begin
+      // HBURST: WRAP8, HTRANS: BUSY
+      // Do not write data in BUSY state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S19:
     begin
+      // HBURST: WRAP8, HTRANS: NONSEQ
+      // Beginning of WRAP8 burst.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S20:
     begin
+      // HBURST: WRAP8, HTRANS: SEQ
+      // Continuation of burst from state S20.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S21:
     begin
+      // HBURST: INCR8, HTRANS: IDLE
+      // Do not write data in IDLE state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S22:
     begin
+      // HBURST: INCR8, HTRANS: BUSY
+      // Do not write data in BUSY state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S23:
     begin
+      // HBURST: INCR8, HTRANS: NONSEQ
+      // Beginning of INCR8 burst.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S24:
     begin
+      // HBURST: INCR8, HTRANS: SEQ
+      // Continuation of burst from state S23.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S25:
     begin
+      // HBURST: WRAP16, HTRANS: IDLE
+      // Do not write data in IDLE state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S26:
     begin
+      // HBURST: WRAP16, HTRANS: BUSY
+      // Do not write data in BUSY state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S27:
     begin
+      // HBURST: WRAP16, HTRANS: NONSEQ
+      // Beginning of WRAP16 burst.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S28:
     begin
+      // HBURST: WRAP16, HTRANS: SEQ
+      // Continuation of burst from state S26.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S29:
     begin
+      // HBURST: INCR16, HTRANS: IDLE
+      // Do not write data in IDLE state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S30:
     begin
+      // HBURST: INCR16, HTRANS: BUSY
+      // Do not write data in BUSY state.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S31:
     begin
+      // HBURST: INCR16, HTRANS: NONSEQ
+      // Beginning of WRAP16 burst.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
     S32:
     begin
+      // HBURST: INCR16, HTRANS: SEQ
+      // Continuation of burst from state 31.
 
+      // Not supported
+      next_write_error <= 1'b1;
     end
 
   endcase

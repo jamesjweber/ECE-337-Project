@@ -1,4 +1,4 @@
-vmodule transfer_response (
+module transfer_response (
   input wire HCLK,
   input wire HRESETn,
   input wire enable,

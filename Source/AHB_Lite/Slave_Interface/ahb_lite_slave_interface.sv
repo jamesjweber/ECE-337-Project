@@ -9,21 +9,23 @@ module ahb_lite_slave_interface (
 	input wire [1:0] HTRANS,
 	input wire HREADY,
 	input wire [128:0] HWDATA,
-	input wire fifoFull,
+	input wire fifo_full,
 	output reg HREADYOUT,
 	output reg HRESP,
 	output reg [128:0] HRDATA
 	output reg [128:0] key,
 	output reg [128:0] nonce,
 	output reg [128:0] destination,
-	output reg [128:0] plainText
+	output reg [128:0] plain_text
 );
 
 // Internal Signals
 wire [127:0] SWDATA;
-wire sizeControlError;
-wire readWriteError;
-wire readWriteReady;
+wire size_control_error;
+wire read_error;
+wire read_ready;
+wire write_error;
+wire write_ready;
 
 wire enable;
 wire error;
@@ -33,19 +35,13 @@ reg [31:0] prevAddress;
 
 // Combining Signals
 assign enable = HSELx && HREADY;
-assign error = sizeControlError || readWriteError; // and future error signals
-assign ready = readWriteReady; // and future response signals
+assign error = size_control_error || read_error || write_error; // and future error signals
+assign ready = read_ready && write_ready; // and future response signals
 
 // Internal Blocks
 transfer_response TR(HCLK, HRESETn, HSELx, ready, error, HREADY, HRESP);
-size_control SC(HSLEx, HWDATA, HSIZE, SWDATA, sizeControlError);
-
-always_ff @ (negedge HCLK, negedge HRESETn) begin
-	if (HRESETn == 1'b1) begin
-		prevAddress <= 32'b0;
-	end else begin
-		prevAddress <= HADDR;
-	end
-end
+size_control SC(HCLK, HRESETn, HSLEx, HWDATA, HSIZE, SWDATA, size_control_error);
+slave_read SR(HCLK, HRESETn, HSLEx, HADDR, HBURST, HTRANS, HREADY, fifo_full, SWDATA, key, nonce, destination, plain_text, write_error, write_ready);
+slave_write SW(HCLK, HRESETn, HSLEx, HADDR, HBURST, HTRANS, HREADY, fifo_full, SWDATA, key, nonce, destination, plain_text, write_error, write_ready);
 
 endmodule // ahb_lite_slave_interface
