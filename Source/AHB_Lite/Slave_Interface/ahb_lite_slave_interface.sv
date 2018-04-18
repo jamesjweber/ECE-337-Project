@@ -26,15 +26,10 @@ wire read_error;
 wire read_ready;
 wire write_error;
 wire write_ready;
-
-wire enable;
 wire error;
 wire ready;
 
-reg [31:0] prevAddress;
-
 // Combining Signals
-assign enable = HSELx && HREADY;
 assign error = size_control_error || read_error || write_error; // and future error signals
 assign ready = read_ready && write_ready; // and future response signals
 
