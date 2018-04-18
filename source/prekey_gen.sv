@@ -10,7 +10,7 @@ wire [31:0] hold;
 
 always_comb
 begin
-	count = count + 1;
+	//counter thing
 end
 
 assign hold = preKeyIn[31:0] ^ preKeyIn[63:32] ^ preKeyIn[95:64] ^ preKeyIn[127:96] ^ 32'h9e3779b9 ^ count;
