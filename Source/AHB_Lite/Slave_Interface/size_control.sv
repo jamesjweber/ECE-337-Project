@@ -35,9 +35,9 @@ always_comb begin
 		next_SWDATA <= {96'b0,HWDATA[31:0]};
 	end else if (HSIZE == 3'b011) begin // Doubleword
 		next_SWDATA <= {64'b0,HWDATA[63:0]};
-	end else if (HSIZE == 3'b100) // 4-Word
+	end else if (HSIZE == 3'b100) begin // 4-Word
 		next_SWDATA <= HWDATA;
-	end else // If greater than 4-word, send error signal
+	end else begin // If greater than 4-word, send error signal
 		next_SWDATA <= HWDATA;
 		next_ERROR <= 1'b1;
 	end

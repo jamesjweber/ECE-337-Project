@@ -71,7 +71,7 @@ always_comb begin
   end else begin
     if (state == {HBURST,HTRANS}) begin
       next_state <= {HBURST,HTRANS};
-    end else beign
+    end else begin
       next_state <= state;
       next_write_error <= 1'b1;
     end
@@ -98,16 +98,16 @@ always_comb begin
       // Single burst write
       if (HREADY == 1'b1) begin
         // If ready write to address
-        if (prev_HADDR[7:0] = 1'h80) begin
+        if (prev_HADDR[7:0] = 2'h80) begin
           // Key Address
           next_key <= SWDATA;
-        end else if (prev_HADDR[7:0] = 1'h100) begin
+        end else if (prev_HADDR[7:0] = 3'h100) begin
           // Nonce Address
           next_nonce <= SWDATA;
-        end else if (prev_HADDR[7:0] = 1'h180) begin
+        end else if (prev_HADDR[7:0] = 3'h180) begin
           // Destination Address
           next_destination <= SWDATA;
-        end else if (prev_HADDR[7:0] = 1'h200) begin
+        end else if (prev_HADDR[7:0] = 3'h200) begin
           // Plain Text Address
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
             next_plain_text <= SWDATA;
@@ -382,5 +382,7 @@ always_comb begin
     end
 
   endcase
+
+end
 
 endmodule // slave_write
