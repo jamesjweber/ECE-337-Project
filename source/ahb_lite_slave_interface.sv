@@ -12,7 +12,6 @@ module ahb_lite_slave_interface (
 	input wire fifo_full,
 	output reg HREADYOUT,
 	output reg HRESP,
-	output reg [128:0] plain_text
 	output reg [31:0] HRDATA,
 	output reg [127:0] key,
 	output reg [127:0] nonce,
