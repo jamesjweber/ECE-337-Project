@@ -92,18 +92,67 @@ module tb_ahb_lite_master_interface();
 	tb_test_num += 1;
 	tb_test_case = "Send Destination Address";
 
-  tb_destination = 8'h00000004;
+  tb_destination = 8'h4;
   tb_dest_updated = 1'b1;
 
 	@(posedge tb_HCLK)
 
   tb_dest_updated = 1'b0;
 
-  if (tb_HADDR == 8'h00000004) begin
+  if (tb_HADDR == 8'h4) begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
     $display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);
   end
   
+	// Test Case 3 - Load and Write Test Data
+	tb_test_num += 1;
+	tb_test_case = "Load and Write Test Data";
+	
+	tb_text_rcvd = 1'b1;
+	
+	@(posedge tb_HCLK)
+	
+	tb_text_rcvd = 1'b0;
+	tb_encr_text = 128'h2A472D4B6150645367566B5970337336; // example encr_text
+	
+	@(posedge tb_HCLK)
+	
+	tb_encr_text = 128'h25432A462D4A614E645266556A586E32;
+	
+	@(posedge tb_HCLK)
+	
+	tb_encr_text = 128'h7638792F423F4528472B4B6250655368;
+	
+	@(posedge tb_HCLK)
+	
+	tb_encr_text = 128'h432646294A404D635166546A576E5A72;
+	
+	@(posedge tb_HCLK) // 1
+	@(posedge tb_HCLK) // 2
+	@(posedge tb_HCLK) // 3
+	@(posedge tb_HCLK) // 4
+	@(posedge tb_HCLK) // 5
+	@(posedge tb_HCLK) // 6
+	@(posedge tb_HCLK) // 7
+	@(posedge tb_HCLK) // 8
+	@(posedge tb_HCLK) // 9
+	@(posedge tb_HCLK) // 10
+	@(posedge tb_HCLK) // 11
+	@(posedge tb_HCLK) // 12
+	@(posedge tb_HCLK) // 13
+	@(posedge tb_HCLK) // 14
+	@(posedge tb_HCLK) // 15
+	@(posedge tb_HCLK) // 16
+  
+  @(posedge tb_HCLK)
+  
+  if (tb_HADDR == 8'h00000040) begin
+    $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
+  end else begin
+    $display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);
+    $display("HADDR: %h", tb_HADDR);
+  end
+	
   end
 endmodule
