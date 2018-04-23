@@ -7,7 +7,7 @@ module ahb_lite_master_interface (
   input wire [31:0] destination,
   input wire dest_updated,
   input wire [127:0] encr_text,
-  input wire signal_recieved,
+  input wire text_rcvd,
   output reg [31:0] HADDR,
   output reg HWRITE,
   output reg [2:0] HSIZE,
@@ -16,6 +16,6 @@ module ahb_lite_master_interface (
   output reg [31:0] HWDATA
 );
 
-master_write MW(HCLK, HRESETn, HREADY, HRESP, HRDATA, destination, dest_updated, encr_text, signal_recieved, HADDR, HWRITE, HSIZE, HBURST, HTRANS, HWDATA);
+master_write MW(HCLK, HRESETn, HREADY, HRESP, HRDATA, destination, dest_updated, encr_text, text_rcvd, HADDR, HWRITE, HSIZE, HBURST, HTRANS, HWDATA);
 
 endmodule // ahb_lite_master_interface

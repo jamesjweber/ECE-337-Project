@@ -7,7 +7,7 @@ module master_write (
   input wire [31:0] destination,
   input wire dest_updated,
   input wire [127:0] encr_text,
-  input wire signal_recieved,
+  input wire text_rcvd,
   output reg [31:0] HADDR,
   output reg HWRITE,
   output reg [2:0] HSIZE,
@@ -78,7 +78,7 @@ always_comb begin
   case (state)
     IDLE:
     begin
-      if (signal_recieved == 1'b1) begin
+      if (text_rcvd == 1'b1) begin
         next_state = LOAD1;
       end
       HWRITE = 1'b0;
@@ -291,7 +291,7 @@ always_comb begin
     SEQ15:
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
-        if (signal_recieved == 1'b1) begin
+        if (text_rcvd == 1'b1) begin
           next_state = NONSEQ;
           next_dest = destination;
         end else begin
