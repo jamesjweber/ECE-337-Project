@@ -2,7 +2,7 @@
 
 `timescale 1ns / 10ps
 
-module tb_flex_counter();
+module tb_ahb_lite_master_interface();
 
 	// Define parameters
 	// basic test bench parameters
@@ -48,17 +48,19 @@ module tb_flex_counter();
     .destination(tb_destination),
     .dest_updated(tb_dest_updated),
     .encr_text(tb_encr_text),
-    .signal_received(tb_text_rcvd),
+    .text_rcvd(tb_text_rcvd),
     .HADDR(tb_HADDR),
     .HWRITE(tb_HWRITE),
+    .HSIZE(tb_HSIZE),
     .HBURST(tb_HBURST),
     .HTRANS(tb_HTRANS),
     .HWDATA(tb_HWDATA)
-  )
+  );
 
 	// Test bench process
 	initial
 	begin
+		$display("me and my grandma take meds, ooh");
 		// Initialize all of the test inputs
 		tb_HRESETn      = 1'b1;		// Initialize to be inactive
 		tb_HREADY		    = 1'b1; 	// Initialize to be high (ready)
@@ -71,19 +73,19 @@ module tb_flex_counter();
 
 		tb_test_num = 0;
 		tb_test_case = "Test bench initializaton";
-		@(posedge tb_clk)
+		@(posedge tb_HCLK)
 
 		// Test Case 1 - Initial Reset
 		tb_test_num += 1;
 		tb_test_case = "Initial Reset";
 
-		tb_n_rst = 0;	// set reset (active low)
-		@(posedge tb_clk)
+		tb_HRESETn = 0;	// set reset (active low)
+		@(posedge tb_HCLK)
 
-		if (tb_HADDR == '0 && tb_HWRITE == 1'b1) begin
-			$info("%s: Case %d, PASSED!", tb_test_case, tb_test_num);
+		if (tb_HADDR == '0 && tb_HWRITE == 1'b0) begin
+			$display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
 		end else begin
-			$info("%s: Case %d, FAILED!", tb_test_case, tb_test_num);
+			$display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);
 		end
 
 	end
