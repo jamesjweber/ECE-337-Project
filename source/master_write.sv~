@@ -7,7 +7,7 @@ module master_write (
   input wire [31:0] destination,
   input wire dest_updated,
   input wire [127:0] encr_text,
-  input wire signal_recieved,
+  input wire text_rcvd,
   output reg [31:0] HADDR,
   output reg HWRITE,
   output reg [2:0] HSIZE,
@@ -26,6 +26,7 @@ stateType next_state;
 // Registers
 reg [31:0] dest;
 reg [31:0] next_dest;
+reg [31:0] next_HWDATA;
 reg [127:0] encr_text_1;
 reg [127:0] next_encr_text_1;
 reg [127:0] encr_text_2;
@@ -35,7 +36,7 @@ reg [127:0] next_encr_text_3;
 reg [127:0] encr_text_4;
 reg [127:0] next_encr_text_4;
 
-always_ff @ (posedge HCLK, negedge HRESETn, negedge HREADY, negedge HRESP, negedge dest_updated) begin
+always_ff @ (posedge HCLK, negedge HRESETn, posedge HREADY, posedge HRESP, posedge dest_updated) begin
 
   if (HRESETn == 1'b0 && HREADY == 1'b1 && HRESP == 1'b0) begin // If selected & !reset & !error
     if (dest_updated == 1'b1) begin
@@ -47,6 +48,7 @@ always_ff @ (posedge HCLK, negedge HRESETn, negedge HREADY, negedge HRESP, neged
     encr_text_2 <= next_encr_text_2;
     encr_text_3 <= next_encr_text_3;
     encr_text_4 <= next_encr_text_4;
+    HWDATA <= next_HWDATA;
     state <= next_state;
   end else begin
     dest <= 32'b0;
@@ -54,6 +56,7 @@ always_ff @ (posedge HCLK, negedge HRESETn, negedge HREADY, negedge HRESP, neged
     encr_text_2 <= 128'b0;
     encr_text_3 <= 128'b0;
     encr_text_4 <= 128'b0;
+    HWDATA <= 32'b0;
     state <= IDLE;
   end
 end
@@ -65,20 +68,20 @@ always_comb begin
   next_encr_text_2 = encr_text_2;
   next_encr_text_3 = encr_text_3;
   next_encr_text_4 = encr_text_4;
+  next_HWDATA = 32'b0;
   next_state = state;
 
   // Defaults
-  HSIZE = 3'b010   // Word
+  HSIZE = 3'b010;   // Word
   HWRITE = 1'b1;   // Write
   HBURST = 3'b111; // 16-beat incr burst
   HTRANS = 2'b00;  // IDLE
   HADDR = dest;    // Default address is in 'dest'
-  HWDATA = 128'b0; // Write data initially 0
 
   case (state)
     IDLE:
     begin
-      if (signal_recieved == 1'b1) begin
+      if (text_rcvd == 1'b1) begin
         next_state = LOAD1;
       end
       HWRITE = 1'b0;
@@ -112,9 +115,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ1;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b10;
-        HWDATA = encr_text_1[31:0];
+        next_HWDATA = encr_text_1[31:0];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -124,9 +127,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ2;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_1[63:32];
+        next_HWDATA = encr_text_1[63:32];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -136,9 +139,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ3;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_1[95:64];
+        next_HWDATA = encr_text_1[95:64];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -148,9 +151,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ4;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_1[127:96];
+        next_HWDATA = encr_text_1[127:96];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -160,9 +163,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ5;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_2[31:0];
+        next_HWDATA = encr_text_2[31:0];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -172,9 +175,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ6;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_2[63:32];
+        next_HWDATA = encr_text_2[63:32];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -184,9 +187,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ7;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_2[95:64];
+        next_HWDATA = encr_text_2[95:64];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -196,9 +199,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ8;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_2[127:96];
+        next_HWDATA = encr_text_2[127:96];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -208,9 +211,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ9;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_3[31:0];
+        next_HWDATA = encr_text_3[31:0];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -220,9 +223,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ10;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_3[63:32];
+        next_HWDATA = encr_text_3[63:32];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -232,9 +235,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ11;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_3[95:64];
+        next_HWDATA = encr_text_3[95:64];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -244,9 +247,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ12;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_3[127:96];
+        next_HWDATA = encr_text_3[127:96];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -256,9 +259,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ13;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_4[31:0];
+        next_HWDATA = encr_text_4[31:0];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -268,9 +271,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ14;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_4[63:32];
+        next_HWDATA = encr_text_4[63:32];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -280,9 +283,9 @@ always_comb begin
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
         next_state = SEQ15;
-        next_dest = dest + 1'h4;
+        next_dest = dest + 32'h4;
         HTRANS = 2'b11;
-        HWDATA = encr_text_4[95:64];
+        next_HWDATA = encr_text_4[95:64];
       end else begin
         HTRANS = 2'b01; // busy
       end
@@ -291,14 +294,14 @@ always_comb begin
     SEQ15:
     begin
       if (HREADY == 1'b1 && HRESP == 1'b0) begin
-        if (signal_recieved == 1'b1) begin
+        if (text_rcvd == 1'b1) begin
           next_state = NONSEQ;
           next_dest = destination;
         end else begin
           next_state = IDLE;
         end
         HTRANS = 2'b11;
-        HWDATA = encr_text_4[127:96];
+        next_HWDATA = encr_text_4[127:96];
       end else begin
         HTRANS = 2'b01; // busy
       end

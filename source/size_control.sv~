@@ -24,7 +24,6 @@ always_comb begin
 		end
 	end else begin
 		SWDATA = 32'b0;
-		ERROR = 1'b0;
 	end
 
 end
