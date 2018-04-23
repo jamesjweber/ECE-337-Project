@@ -92,8 +92,18 @@ module tb_ahb_lite_master_interface();
 	tb_test_num += 1;
 	tb_test_case = "Send Destination Address";
 
+  tb_destination = 8'h00000004;
+  tb_dest_updated = 1'b1;
+
 	@(posedge tb_HCLK)
 
-	
+  tb_dest_updated = 1'b0;
+
+  if (tb_HADDR == 8'h00000004) begin
+    $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
+  end else begin
+    $display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);
+  end
+  
   end
 endmodule
