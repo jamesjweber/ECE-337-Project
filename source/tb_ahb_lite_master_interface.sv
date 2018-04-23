@@ -88,5 +88,12 @@ module tb_ahb_lite_master_interface();
       $display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);
     end
 
+	// Test Case 2 - Send Destination Address
+	tb_test_num += 1;
+	tb_test_case = "Send Destination Address";
+
+	@(posedge tb_HCLK)
+
+	
   end
 endmodule
