@@ -68,7 +68,7 @@ always_comb begin
   next_state = state;
 
   // Defaults
-  HSIZE = 3'b010;   // Word
+  HSIZE = 3'b010   // Word
   HWRITE = 1'b1;   // Write
   HBURST = 3'b111; // 16-beat incr burst
   HTRANS = 2'b00;  // IDLE
