@@ -46,9 +46,9 @@ always_ff @ (posedge HCLK, posedge HSELx, negedge HRESETn) begin
     destination <= 32'b0;
     plain_text <= 128'b0;
     state <= S1;
-    write_out = 1'b0;
-    write_error = 1'b0;
-    write_ready = 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
+    //write_out = 1'b0;
+    //write_error = 1'b0;
+    //write_ready = 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
     prev_HADDR <= 32'b0;
   end
 end
