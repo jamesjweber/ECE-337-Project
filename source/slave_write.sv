@@ -27,9 +27,6 @@ reg [127:0] next_key;
 reg [127:0] next_nonce;
 reg [31:0] next_destination;
 reg [127:0] next_plain_text;
-reg next_write_error;
-reg next_write_ready;
-reg next_write_out;
 reg [31:0] prev_HADDR;
 
 
@@ -39,13 +36,6 @@ always_ff @ (posedge HCLK, posedge HSELx, negedge HRESETn) begin
     nonce <= next_nonce;
     destination <= next_destination;
     plain_text <= next_plain_text;
-    if (write_error == 1'b0) begin
-    	write_error <= next_write_error;
-    end else begin
-    	write_error <= 1'b0;
-    end
-    write_ready <= next_write_ready;
-    write_out <= next_write_out;
     $display("[STATE]: %s <= %s :[NEXT_STATE]",state, next_state);
     state <= next_state;
     $display("[NEW_STATE]: %s <= %s :[NEXT_STATE]",state, next_state);
@@ -56,9 +46,9 @@ always_ff @ (posedge HCLK, posedge HSELx, negedge HRESETn) begin
     destination <= 32'b0;
     plain_text <= 128'b0;
     state <= S1;
-    write_out <= 1'b0;
-    write_error <= 1'b0;
-    write_ready <= 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
+    write_out = 1'b0;
+    write_error = 1'b0;
+    write_ready = 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
     prev_HADDR <= 32'b0;
   end
 end
@@ -71,9 +61,9 @@ always_comb begin
   next_destination = destination;
   next_plain_text = plain_text;
   next_state = state;
-  next_write_error = 1'b0;
-  next_write_ready = 1'b1;
-  next_write_out = 1'b0;
+  write_error = 1'b0;
+  write_ready = 1'b1;
+  write_out = 1'b0;
 
   // See slave_write.md (README) for description of all states
 
@@ -86,7 +76,7 @@ always_comb begin
       convert({HBURST, HTRANS}, next_state); // Set next state
       $display("next state(S1): %s", next_state);
 			if (HREADY != 1'b1 && state != next_state) begin
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -94,11 +84,11 @@ always_comb begin
     begin
       // HBURST: SINGLE, HTRANS: BUSY
       // Nonsensical state, raise error
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
       $display("next state(S2): %s", next_state);
 			if (HREADY != 1'b1 && state != next_state) begin
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -144,39 +134,39 @@ always_comb begin
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
             next_plain_text[31:0] = SWDATA;
           end else begin
-            next_write_ready = 1'b0;
+            write_ready = 1'b0;
           end
         end else if (prev_HADDR[7:0] == 8'h38) begin
           // Plain Text Address (2/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
             next_plain_text[63:32] = SWDATA;
           end else begin
-            next_write_ready = 1'b0;
+            write_ready = 1'b0;
           end
         end else if (prev_HADDR[7:0] == 8'h3C) begin
           // Plain Text Address (3/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
             next_plain_text[95:64] = SWDATA;
           end else begin
-            next_write_ready = 1'b0;
+            write_ready = 1'b0;
           end
         end else if (prev_HADDR[7:0] == 8'h40) begin
           // Plain Text Address (4/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
             next_plain_text = SWDATA;
-            next_write_out = 1'b1;
+            write_out = 1'b1;
           end else begin
-            next_write_ready = 1'b0;
+            write_ready = 1'b0;
           end
         end else begin
           // Invalid Address
-          next_write_error = 1'b1;
+          write_error = 1'b1;
         end
       end
 			convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -184,11 +174,11 @@ always_comb begin
     begin
       // HBURST: SINGLE, HTRANS: SEQ
       // Nonsensical state, raise error
-      next_write_error = 1'b1;
+      write_error = 1'b1;
        convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -198,11 +188,11 @@ always_comb begin
       // Do not write data in IDLE state
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -212,11 +202,11 @@ always_comb begin
       // Do not write data in BUSY state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -226,7 +216,7 @@ always_comb begin
       // Beginning of INCR burst.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
     end
 
     S8:
@@ -235,7 +225,7 @@ always_comb begin
       // Continuation of burst from state S7
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
     end
 
     S9:
@@ -244,7 +234,7 @@ always_comb begin
       // Do not write data in IDLE state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
     end
 
     S10:
@@ -253,11 +243,11 @@ always_comb begin
       // Do not write data in BUSY state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -267,11 +257,11 @@ always_comb begin
       // Beginning of WRAP4 burst.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -281,7 +271,7 @@ always_comb begin
       // Continuation of burst from state S11.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
     end
 
     S13:
@@ -290,11 +280,11 @@ always_comb begin
       // Do not write data in IDLE state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -304,11 +294,11 @@ always_comb begin
       // Do not write data in BUSY state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -318,11 +308,11 @@ always_comb begin
       // Beginning of INCR4 burst.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -332,11 +322,11 @@ always_comb begin
       // Continuation of burst from state S15.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -346,11 +336,11 @@ always_comb begin
       // Do not write data in IDLE state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -360,11 +350,11 @@ always_comb begin
       // Do not write data in BUSY state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -374,11 +364,11 @@ always_comb begin
       // Beginning of WRAP8 burst.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -388,11 +378,11 @@ always_comb begin
       // Continuation of burst from state S20.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -402,11 +392,11 @@ always_comb begin
       // Do not write data in IDLE state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -416,11 +406,11 @@ always_comb begin
       // Do not write data in BUSY state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -430,7 +420,7 @@ always_comb begin
       // Beginning of INCR8 burst.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
     end
 
     S24:
@@ -439,11 +429,11 @@ always_comb begin
       // Continuation of burst from state S23.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -453,11 +443,11 @@ always_comb begin
       // Do not write data in IDLE state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -467,11 +457,11 @@ always_comb begin
       // Do not write data in BUSY state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -481,11 +471,11 @@ always_comb begin
       // Beginning of WRAP16 burst.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -495,11 +485,11 @@ always_comb begin
       // Continuation of burst from state S26.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -509,11 +499,11 @@ always_comb begin
       // Do not write data in IDLE state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -523,11 +513,11 @@ always_comb begin
       // Do not write data in BUSY state.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -537,11 +527,11 @@ always_comb begin
       // Beginning of WRAP16 burst.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
@@ -551,11 +541,11 @@ always_comb begin
       // Continuation of burst from state 31.
 
       // Not supported
-      next_write_error = 1'b1;
+      write_error = 1'b1;
       convert({HBURST, HTRANS}, next_state); // Set next state
 			if (HREADY != 1'b1 && state != next_state) begin
 				next_state = state;
-				next_write_error = 1'b1;
+				write_error = 1'b1;
 			end
     end
 
