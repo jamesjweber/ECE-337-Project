@@ -23,31 +23,17 @@ typedef enum bit [4:0] {S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S
 // Internal Signals
 stateType state;
 stateType next_state;
-reg [127:0] next_key;
-reg [127:0] next_nonce;
-reg [31:0] next_destination;
-reg [127:0] next_plain_text;
 reg [31:0] prev_HADDR;
 
 
 always_ff @ (posedge HCLK, posedge HSELx, negedge HRESETn) begin
   if (HRESETn == 1'b0 && HSELx == 1'b1) begin // If selected and not being reset
-    key <= next_key;
-    nonce <= next_nonce;
-    destination <= next_destination;
-    plain_text <= next_plain_text;
     $display("[STATE]: %s <= %s :[NEXT_STATE]",state, next_state);
     state <= next_state;
     $display("[NEW_STATE]: %s <= %s :[NEXT_STATE]",state, next_state);
     prev_HADDR <= HADDR;
   end else begin // Else if being reset and/or not currently selected
-    key <= 128'b0;
-    nonce <= 128'b0;
-    destination <= 32'b0;
-    plain_text <= 128'b0;
     state <= S1;
-    //write_out = 1'b0;
-    //write_error = 1'b0;
     //write_ready = 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
     prev_HADDR <= 32'b0;
   end
@@ -56,10 +42,10 @@ end
 
 always_comb begin
 
-  next_key = key;
-  next_nonce = nonce;
-  next_destination = destination;
-  next_plain_text = plain_text;
+  key = 128'b0;
+  nonce = 128'b0;
+  destination = 32'b0;
+  plain_text = 128'b0;
   next_state = state;
   write_error = 1'b0;
   write_ready = 1'b1;
@@ -104,56 +90,56 @@ always_comb begin
         if (prev_HADDR[7:0] == 8'h04) begin
           // Key Address (1/4)
           $display("GUCCI GANG");
-          next_key[31:0] = SWDATA;
+          key[31:0] = SWDATA;
         end if (prev_HADDR[7:0] == 8'h08) begin
           // Key Address (2/4)
-          next_key[63:31] = SWDATA;
+          key[63:31] = SWDATA;
         end if (prev_HADDR[7:0] == 8'h0C) begin
           // Key Address (3/4)
-          next_key[95:64] = SWDATA;
+          key[95:64] = SWDATA;
         end if (prev_HADDR[7:0] == 8'h10) begin
           // Key Address
-          next_key[127:96] = SWDATA;
+          key[127:96] = SWDATA;
         end else if (prev_HADDR[7:0] == 8'h14) begin
           // Nonce Address (1/4)
-          next_nonce[31:0] = SWDATA;
+          nonce[31:0] = SWDATA;
         end else if (prev_HADDR[7:0] == 8'h18) begin
           // Nonce Address (2/4)
-          next_nonce[63:32] = SWDATA;
+          nonce[63:32] = SWDATA;
         end else if (prev_HADDR[7:0] == 8'h1C) begin
           // Nonce Address (3/4)
-          next_nonce[95:64] = SWDATA;
+          nonce[95:64] = SWDATA;
         end else if (prev_HADDR[7:0] == 8'h20) begin
           // Nonce Address (4/4)
-          next_nonce[127:96] = SWDATA;
+          nonce[127:96] = SWDATA;
         end else if (prev_HADDR[7:0] == 8'h24) begin
           // Destination Address (1/1)
-          next_destination = SWDATA;
+          destination = SWDATA;
         end else if (prev_HADDR[7:0] == 8'h34) begin
           // Plain Text Address (1/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
-            next_plain_text[31:0] = SWDATA;
+            plain_text[31:0] = SWDATA;
           end else begin
             write_ready = 1'b0;
           end
         end else if (prev_HADDR[7:0] == 8'h38) begin
           // Plain Text Address (2/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
-            next_plain_text[63:32] = SWDATA;
+            plain_text[63:32] = SWDATA;
           end else begin
             write_ready = 1'b0;
           end
         end else if (prev_HADDR[7:0] == 8'h3C) begin
           // Plain Text Address (3/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
-            next_plain_text[95:64] = SWDATA;
+            plain_text[95:64] = SWDATA;
           end else begin
             write_ready = 1'b0;
           end
         end else if (prev_HADDR[7:0] == 8'h40) begin
           // Plain Text Address (4/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
-            next_plain_text = SWDATA;
+            plain_text = SWDATA;
             write_out = 1'b1;
           end else begin
             write_ready = 1'b0;
