@@ -8,7 +8,7 @@
 
 module flex_counter
 #(
-	parameter NUM_CNT_BITS = 6
+	parameter NUM_CNT_BITS = 8
 )
 (
 	input wire clk,
