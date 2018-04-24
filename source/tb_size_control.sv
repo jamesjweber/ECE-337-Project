@@ -53,14 +53,14 @@ module tb_size_control();
 
 		// Test Case 1 - Send Multiple Sizes (No resets/select changes)
 		tb_test_num += 1;
-		tb_test_case = "Send Multiple Sizes (No resets/select changes)";
+		tb_test_case = 	"Send Multiple Sizes (No resets/select changes)";
 		$display("%s: Case %1.1f", tb_test_case, tb_test_num);
 		
 		tb_HWDATA = 32'h12345678;
 		@(posedge tb_HCLK)
 		
 		// Test Case 1.1 - Sending data [Byte]
-		tb_test_num += .1;
+		tb_test_num += 0.1;
 		tb_test_case = 		"Sending data [Byte]";
 		
 		tb_HSIZE = 3'b000;
@@ -74,7 +74,7 @@ module tb_size_control();
     end
     
     // Test Case 1.2 - Sending data [Halfword]
-		tb_test_num += .1;
+		tb_test_num += 0.1;
 		tb_test_case = 		"Sending data [Halfword]";
 		
 		tb_HSIZE = 3'b001;
@@ -88,7 +88,7 @@ module tb_size_control();
     end
     
     // Test Case 1.3 - Sending data [Word]
-		tb_test_num += .1;
+		tb_test_num += 0.1;
 		tb_test_case = 		"Sending data [Word]";
 		
 		tb_HSIZE = 3'b010;
@@ -102,7 +102,7 @@ module tb_size_control();
     end
     
     // Test Case 1.4 - Sending data [Doubleword]
-		tb_test_num += .1;
+		tb_test_num += 0.1;
 		tb_test_case = 		"Sending data [Doubleword]";
 		
 		tb_HSIZE = 3'b011;
@@ -110,6 +110,20 @@ module tb_size_control();
 		@(posedge tb_HCLK)
 		
 		if (tb_SWDATA == 32'h12345678 && tb_ERROR == 1'b1) begin
+      $display("%s: Case %1.1f, PASSED!", tb_test_case, tb_test_num);
+    end else begin
+      $display("%s: Case %1.1f, FAILED!", tb_test_case, tb_test_num);
+    end
+    
+    // Test Case 2 - Chip Deselect
+    tb_test_num = 2;
+    tb_test_case = 	"Chip Deselect";
+    
+    tb_HSELx = 1'b0;
+    
+    @(posedge tb_HCLK)
+		
+		if (tb_SWDATA == 32'h0 && tb_ERROR == 1'b0) begin
       $display("%s: Case %1.1f, PASSED!", tb_test_case, tb_test_num);
     end else begin
       $display("%s: Case %1.1f, FAILED!", tb_test_case, tb_test_num);
