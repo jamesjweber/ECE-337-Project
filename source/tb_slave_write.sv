@@ -26,21 +26,43 @@ module tb_slave_write();
   reg tb_write_error;
   reg tb_write_ready;
   
-  /*
-  input wire HCLK,
-  input wire HRESETn,
-  input wire HSELx,
-  input wire [31:0] HADDR,
-	input wire [2:0] HBURST,
-	input wire [1:0] HTRANS,
-  input wire HREADY,
-  input wire fifo_full,
-	input wire [31:0] SWDATA,
-  output reg [127:0] key,
-	output reg [127:0] nonce,
-	output reg [31:0] destination,
-	output reg [127:0] plain_text,
-  output reg write_out,
-  output reg write_error,
-	output reg write_ready
-  */
+
+	// Test bench process
+  initial
+  begin
+    // Initialize all of the test inputs
+    tb_HSELx		= 1'b1;		// Initialize to high (chip selected)
+    tb_HWDATA		= 32'b0;	// Set all data to 0 initially
+    tb_HSIZE		= 3'b0;		// Set size to halfword initially
+
+    tb_test_num = 0;
+    tb_test_case = "Test bench initializaton";
+   	$display("%s: Case %1d", tb_test_case, tb_test_num);
+    @(posedge tb_HCLK)
+
+
+		// Test Case 1 - Send Multiple Sizes (No resets/select changes)
+		tb_test_num += 1;
+		tb_test_case = 	"Send Multiple Sizes (No resets/select changes)";
+		$display("%s: Case %1.1f", tb_test_case, tb_test_num);
+		
+		tb_HWDATA = 32'h12345678;
+		@(posedge tb_HCLK)
+		
+		// Test Case 1.1 - Sending data [Byte]
+
+		tb_test_num += 0.1;
+		tb_test_case = 		"Sending data [Byte]";
+		
+		tb_HSIZE = 3'b000;
+		
+		@(posedge tb_HCLK)
+		
+		if (tb_SWDATA == 32'h78 && tb_ERROR == 1'b0) begin
+      $display("%s: Case %1.1f, PASSED!", tb_test_case, tb_test_num);
+    end else begin
+      $display("%s: Case %1.1f, FAILED!", tb_test_case, tb_test_num);
+    end
+	
+  end
+endmodule

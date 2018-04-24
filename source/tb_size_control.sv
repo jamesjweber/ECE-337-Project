@@ -37,7 +37,7 @@ module tb_size_control();
     .ERROR(tb_ERROR)
   );
   
-  	// Test bench process
+  // Test bench process
   initial
   begin
     // Initialize all of the test inputs
