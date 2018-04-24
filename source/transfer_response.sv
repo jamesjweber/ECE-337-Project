@@ -15,9 +15,9 @@ typedef enum bit [1:0] {TL, TH, ERR1, ERR2} stateType;
 always_ff @ (posedge HCLK, posedge enable,negedge HRESETn) begin
   if (enable == 1'b1) begin
     if (HRESETn == 1'b0) begin
-      state <= TL;
+    	state <= next_state;
     end else begin
-      state <= next_state;
+      state <= TL;
     end
   end else begin
     state <= TL; // If disabled, state is transfer low (HREADY and HRESP = 0)
@@ -26,44 +26,44 @@ end
 
 always_comb begin
 
-  next_state <= state; // gets rid of latches
+  next_state = state; // gets rid of latches
 
   case(state)
 
     TL: // Transfer Pending (Transfer Low)
     begin
       // Set State
-      next_state <= error ? ERR1 : ready ? TH : TL;
+      next_state = error ? ERR1 : ready ? TH : TL;
       // Set Output
-      HREADY <= 1'b0;
-      HRESP <= 1'b0;
+      HREADY = 1'b0;
+      HRESP = 1'b0;
     end
 
     TH: // Successful Transfer (Transfer High)
     begin
       // Set State
-      next_state <= error ? ERR1 : ready ? TH : TL;
+      next_state = error ? ERR1 : ready ? TH : TL;
       // Set Output
-      HREADY <= 1'b1;
-      HRESP <= 1'b0;
+      HREADY = 1'b1;
+      HRESP = 1'b0;
     end
 
     ERR1: // Error repsone, cycle 1
     begin
       // Set State
-      next_state <= ERR2;
+      next_state = ERR2;
       // Set Output
-      HREADY <= 1'b0;
-      HRESP <= 1'b1;
+      HREADY = 1'b0;
+      HRESP = 1'b1;
     end
 
     ERR2: // Error repsone, cycle 1
     begin
       // Set State
-      next_state <= ready ? TH : TL;
+      next_state = error ? ERR1 : ready ? TH : TL;
       // Set Output
-      HREADY <= 1'b1;
-      HRESP <= 1'b1;
+      HREADY = 1'b1;
+      HRESP = 1'b1;
     end
 
   endcase

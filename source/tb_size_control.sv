@@ -8,8 +8,8 @@ module tb_size_control();
   localparam	CLK_PERIOD		= 5.0;
   localparam 	AHB_BUS_SIZE 	= 32;
   
+  // Module Signals
   reg tb_HCLK;
-
   reg tb_HSELx;
   reg [AHB_BUS_SIZE - 1:0] tb_HWDATA;
   reg [2:0] tb_HSIZE;
@@ -37,7 +37,7 @@ module tb_size_control();
     .ERROR(tb_ERROR)
   );
   
-  	// Test bench process
+  // Test bench process
   initial
   begin
     // Initialize all of the test inputs
@@ -60,6 +60,7 @@ module tb_size_control();
 		@(posedge tb_HCLK)
 		
 		// Test Case 1.1 - Sending data [Byte]
+
 		tb_test_num += 0.1;
 		tb_test_case = 		"Sending data [Byte]";
 		
