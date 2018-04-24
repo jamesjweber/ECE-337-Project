@@ -16,24 +16,27 @@ module fifo_buffer
 	reg [2:0] curr_write, next_write;
 	reg curr_empty, next_empty, curr_full, next_full;
 
-	// Control pointers and flags using flip-flops.
+	// Control state using flip-flop logic.
 	always_ff @(posedge clk, negedge nRst)
-	begin
+	begin : FF_LOGIC
 		if(nRst == 1'b0)
 		begin
-			curr_read <= 8'b00000000;
-			curr_write <= 8'b00000000;
+			// Reset pointers and flags.
+			curr_read <= 3'b000;
+			curr_write <= 3'b000;
 			curr_empty <= 1'b1;
 			curr_full <= 1'b0;
 		end
 		else
 		begin
+			// Get new values.
 			curr_read <= next_read;
 			curr_write <= next_write;
 			curr_empty <= next_empty;
 			curr_full <= next_full;
 		end
 
+		// Read or write new values.
 		out <= (read & ~empty) | (read & write) ? buffer[curr_read] : out;
 		buffer[curr_write] <= (write & ~full) | (read & write) ? dataIn : buffer[curr_write];
 
@@ -41,6 +44,7 @@ module fifo_buffer
 
 	always_comb
 	begin
+		// Initialize new pointers.
 		next_read = curr_read;
 		next_write = curr_write;
 
@@ -74,6 +78,7 @@ module fifo_buffer
 		endcase
 	end
 
+	// Assign flags and data.
 	assign empty = curr_empty;
 	assign full = curr_full;
 	assign dataOut = out;
