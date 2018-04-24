@@ -7,7 +7,7 @@ module slave_write (
 	input wire [1:0] HTRANS,
   input wire HREADY,
   input wire fifo_full,
-	input wire [127:0] SWDATA,
+	input wire [31:0] SWDATA,
   output reg [127:0] key,
 	output reg [127:0] nonce,
 	output reg [31:0] destination,
