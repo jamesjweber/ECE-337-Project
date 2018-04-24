@@ -2,13 +2,13 @@ module key_block
 (
 	input wire clk,
 	input wire rst,
-	input wire [3:0] select,
+	input wire [2:0] select,
 	input wire [127:0] in,
 	output wire [127:0] roundKey,
 	output wire [127:0] froundKey
 );
 
-wire [127:0] generatorToStorage_con;
+wire [31:0] generatorToStorage_con;
 wire [127:0] storageToGenerator_con;
 wire [127:0] storageToNS_box;
 wire [127:0] storageToFS_box;
@@ -21,8 +21,8 @@ assign fselect = select - 1;
 
 key_storage ksn(.clk(clk),.in(nSboxToStorage),.roundKey(roundKey));
 key_storage ksf(.clk(clk),.in(fSboxToStorage),.roundKey(froundKey));
-s_box fsbox(.in(storageToFS_box),.out(fSboxToStorage), .select(fselect));
-s_box nsbox(.in(storageToNS_box),.out(nSboxToStorage), .select(select));
+s_box fsbox(.inData(storageToFS_box),.outData(fSboxToStorage), .sel(fselect));
+s_box nsbox(.inData(storageToNS_box),.outData(nSboxToStorage), .sel(select));
 prekey_gen pg
 (
 	.clk(clk),
@@ -37,9 +37,9 @@ prekey_storage ps
 	.rst(rst),
 	.keyIn(in),
 	.in(generatorToStorage_con),
-	.gen_preKeys(prekey),
+	.gen_preKeys(storageToGenerator_con),
 	.pre_roundKeys(storageToNS_box),
-	.pre_froundKeys(storageToFS_box),
+	.pre_froundKeys(storageToFS_box)
 );
 
 
