@@ -8,8 +8,8 @@ module tb_size_control();
   localparam	CLK_PERIOD		= 5.0;
   localparam 	AHB_BUS_SIZE 	= 32;
   
+  // Module Signals
   reg tb_HCLK;
-
   reg tb_HSELx;
   reg [AHB_BUS_SIZE - 1:0] tb_HWDATA;
   reg [2:0] tb_HSIZE;
@@ -53,24 +53,16 @@ module tb_size_control();
 
 		// Test Case 1 - Send Multiple Sizes (No resets/select changes)
 		tb_test_num += 1;
-<<<<<<< HEAD
-		tb_test_case = "Send Multiple Sizes (No resets/select changes)";
-=======
 		tb_test_case = 	"Send Multiple Sizes (No resets/select changes)";
->>>>>>> f95b0fc5e1c471ac1e7e44dc5c14aafe472c8286
 		$display("%s: Case %1.1f", tb_test_case, tb_test_num);
 		
 		tb_HWDATA = 32'h12345678;
 		@(posedge tb_HCLK)
 		
 		// Test Case 1.1 - Sending data [Byte]
-<<<<<<< HEAD
-		tb_test_num += .1;
-		tb_test_case = "Sending data [Byte]";
-=======
+
 		tb_test_num += 0.1;
 		tb_test_case = 		"Sending data [Byte]";
->>>>>>> f95b0fc5e1c471ac1e7e44dc5c14aafe472c8286
 		
 		tb_HSIZE = 3'b000;
 		
@@ -80,13 +72,6 @@ module tb_size_control();
       $display("%s: Case %1.1f, PASSED!", tb_test_case, tb_test_num);
     end else begin
       $display("%s: Case %1.1f, FAILED!", tb_test_case, tb_test_num);
-<<<<<<< HEAD
-    	$display("tb_SWDATA: %h", tb_SWDATA);
-    
-    	@(posedge tb_HCLK)
-    	
-    	$display("tb_SWDATA: %h", tb_SWDATA);
-=======
     end
     
     // Test Case 1.2 - Sending data [Halfword]
@@ -143,7 +128,6 @@ module tb_size_control();
       $display("%s: Case %1.1f, PASSED!", tb_test_case, tb_test_num);
     end else begin
       $display("%s: Case %1.1f, FAILED!", tb_test_case, tb_test_num);
->>>>>>> f95b0fc5e1c471ac1e7e44dc5c14aafe472c8286
     end
 	
   end
