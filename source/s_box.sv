@@ -2,167 +2,154 @@ module s_box
 (
 	input wire [2:0] sel,
 	input wire [127:0] inData,
-	output reg [127:0] outData
+	output wire [127:0] outData
 );
 
+	reg [127:0] out;
 	reg [7:0] i;
+
 	always_comb
 	begin
-		for(i = 3; i < 128; i += 4)
-			case (sel)
-				0: // [3 8 15 1 10 6 5 11 14 13 4 2 7 0 9 12]
-					case (inData[i-:3])
-						0: outData[i-:3] = 3;
-						1: outData[i-:3] = 8;
-						2: outData[i-:3] = 15;
-						3: outData[i-:3] = 1;
-						4: outData[i-:3] = 10;
-						5: outData[i-:3] = 6;
-						6: outData[i-:3] = 5;
-						7: outData[i-:3] = 11;
-						8: outData[i-:3] = 14;
-						9: outData[i-:3] = 13;
-						10: outData[i-:3] = 4;
-						11: outData[i-:3] = 2;
-						12: outData[i-:3] = 7;
-						13: outData[i-:3] = 0;
-						14: outData[i-:3] = 9;
-						15: outData[i-:3] = 12;
-					endcase
-				1: // [15 12 2 7 9 0 5 10 1 11 14 8 6 13 3 4]
-					case (inData[i-:3])
-						0: outData[i-:3] = 15;
-						1: outData[i-:3] = 12;
-						2: outData[i-:3] = 2;
-						3: outData[i-:3] = 7;
-						4: outData[i-:3] = 9;
-						5: outData[i-:3] = 0;
-						6: outData[i-:3] = 5;
-						7: outData[i-:3] = 10;
-						8: outData[i-:3] = 1;
-						9: outData[i-:3] = 11;
-						10: outData[i-:3] = 14;
-						11: outData[i-:3] = 8;
-						12: outData[i-:3] = 6;
-						13: outData[i-:3] = 13;
-						14: outData[i-:3] = 3;
-						15: outData[i-:3] = 4;
-					endcase
-				2: // [8 6 7 9 3 12 10 15 13 1 14 4 0 11 5 2]
-					case (inData[i-:3])
-						0: outData[i-:3] = 8;
-						1: outData[i-:3] = 6;
-						2: outData[i-:3] = 7;
-						3: outData[i-:3] = 9;
-						4: outData[i-:3] = 3;
-						5: outData[i-:3] = 12;
-						6: outData[i-:3] = 10;
-						7: outData[i-:3] = 15;
-						8: outData[i-:3] = 13;
-						9: outData[i-:3] = 1;
-						10: outData[i-:3] = 14;
-						11: outData[i-:3] = 4;
-						12: outData[i-:3] = 0;
-						13: outData[i-:3] = 11;
-						14: outData[i-:3] = 5;
-						15: outData[i-:3] = 2;
-					endcase
-				3: // [0 15 11 8 12 9 6 3 13 1 2 4 10 7 5 14]
-					case (inData[i-:3])
-						0: outData[i-:3] = 0;
-						1: outData[i-:3] = 15;
-						2: outData[i-:3] = 11;
-						3: outData[i-:3] = 8;
-						4: outData[i-:3] = 12;
-						5: outData[i-:3] = 9;
-						6: outData[i-:3] = 6;
-						7: outData[i-:3] = 3;
-						8: outData[i-:3] = 13;
-						9: outData[i-:3] = 1;
-						10: outData[i-:3] = 2;
-						11: outData[i-:3] = 4;
-						12: outData[i-:3] = 10;
-						13: outData[i-:3] = 7;
-						14: outData[i-:3] = 5;
-						15: outData[i-:3] = 14;
-					endcase
-				4: // [1 15 8 3 12 0 11 6 2 5 4 10 9 14 7 13]
-					case (inData[i-:3])
-						0: outData[i-:3] = 1;
-						1: outData[i-:3] = 15;
-						2: outData[i-:3] = 8;
-						3: outData[i-:3] = 3;
-						4: outData[i-:3] = 12;
-						5: outData[i-:3] = 0;
-						6: outData[i-:3] = 11;
-						7: outData[i-:3] = 6;
-						8: outData[i-:3] = 2;
-						9: outData[i-:3] = 5;
-						10: outData[i-:3] = 4;
-						11: outData[i-:3] = 10;
-						12: outData[i-:3] = 9;
-						13: outData[i-:3] = 14;
-						14: outData[i-:3] = 7;
-						15: outData[i-:3] = 13;
-					endcase
-				5: // [15 5 2 11 4 10 9 12 0 3 14 8 13 6 7 1]
-					case (inData[i-:3])
-						0: outData[i-:3] = 15;
-						1: outData[i-:3] = 5;
-						2: outData[i-:3] = 2;
-						3: outData[i-:3] = 11;
-						4: outData[i-:3] = 4;
-						5: outData[i-:3] = 10;
-						6: outData[i-:3] = 9;
-						7: outData[i-:3] = 12;
-						8: outData[i-:3] = 0;
-						9: outData[i-:3] = 3;
-						10: outData[i-:3] = 14;
-						11: outData[i-:3] = 8;
-						12: outData[i-:3] = 13;
-						13: outData[i-:3] = 6;
-						14: outData[i-:3] = 7;
-						15: outData[i-:3] = 1;
-					endcase
-				6: // [7 2 12 5 8 4 6 11 14 9 1 15 13 3 10 0]
-					case (inData[i-:3])
-						0: outData[i-:3] = 7;
-						1: outData[i-:3] = 2;
-						2: outData[i-:3] = 12;
-						3: outData[i-:3] = 5;
-						4: outData[i-:3] = 8;
-						5: outData[i-:3] = 4;
-						6: outData[i-:3] = 6;
-						7: outData[i-:3] = 11;
-						8: outData[i-:3] = 14;
-						9: outData[i-:3] = 9;
-						10: outData[i-:3] = 1;
-						11: outData[i-:3] = 15;
-						12: outData[i-:3] = 13;
-						13: outData[i-:3] = 3;
-						14: outData[i-:3] = 10;
-						15: outData[i-:3] = 0;
-					endcase
-				7: // [1 13 15 0 14 8 2 11 7 4 12 10 9 3 5 6]
-					case (inData[i-:3])
-						0: outData[i-:3] = 1;
-						1: outData[i-:3] = 13;
-						2: outData[i-:3] = 15;
-						3: outData[i-:3] = 0;
-						4: outData[i-:3] = 14;
-						5: outData[i-:3] = 8;
-						6: outData[i-:3] = 2;
-						7: outData[i-:3] = 11;
-						8: outData[i-:3] = 7;
-						9: outData[i-:3] = 4;
-						10: outData[i-:3] = 12;
-						11: outData[i-:3] = 10;
-						12: outData[i-:3] = 9;
-						13: outData[i-:3] = 3;
-						14: outData[i-:3] = 5;
-						15: outData[i-:3] = 6;
-					endcase
+		for(i = 0; i < 32; i += 1)
+			case ({sel, {inData[i+96], inData[i+64], inData[i+32], inData[i]}})
+				7'h00: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
+				7'h01: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
+				7'h02: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
+				7'h03: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
+				7'h04: {out[i+96], out[i+64], out[i+32], out[i]} = 10;
+				7'h05: {out[i+96], out[i+64], out[i+32], out[i]} = 6;
+				7'h06: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
+				7'h07: {out[i+96], out[i+64], out[i+32], out[i]} = 11;
+				7'h08: {out[i+96], out[i+64], out[i+32], out[i]} = 14;
+				7'h09: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
+				7'h0A: {out[i+96], out[i+64], out[i+32], out[i]} = 4;
+				7'h0B: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
+				7'h0C: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
+				7'h0D: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
+				7'h0E: {out[i+96], out[i+64], out[i+32], out[i]} = 9;
+				7'h0F: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
+
+				7'h10: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
+				7'h11: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
+				7'h12: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
+				7'h13: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
+				7'h14: {out[i+96], out[i+64], out[i+32], out[i]} = 9;
+				7'h15: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
+				7'h16: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
+				7'h17: {out[i+96], out[i+64], out[i+32], out[i]} = 10;
+				7'h18: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
+				7'h19: {out[i+96], out[i+64], out[i+32], out[i]} = 11;
+				7'h1A: {out[i+96], out[i+64], out[i+32], out[i]} = 14;
+				7'h1B: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
+				7'h1C: {out[i+96], out[i+64], out[i+32], out[i]} = 6;
+				7'h1D: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
+				7'h1E: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
+				7'h1F: {out[i+96], out[i+64], out[i+32], out[i]} = 4;
+
+				7'h20: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
+				7'h21: {out[i+96], out[i+64], out[i+32], out[i]} = 6;
+				7'h22: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
+				7'h23: {out[i+96], out[i+64], out[i+32], out[i]} = 9;
+				7'h24: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
+				7'h25: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
+				7'h26: {out[i+96], out[i+64], out[i+32], out[i]} = 10;
+				7'h27: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
+				7'h28: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
+				7'h29: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
+				7'h2A: {out[i+96], out[i+64], out[i+32], out[i]} = 14;
+				7'h2B: {out[i+96], out[i+64], out[i+32], out[i]} = 4;
+				7'h2C: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
+				7'h2D: {out[i+96], out[i+64], out[i+32], out[i]} = 11;
+				7'h2E: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
+				7'h2F: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
+
+				7'h30: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
+				7'h31: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
+				7'h32: {out[i+96], out[i+64], out[i+32], out[i]} = 11;
+				7'h33: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
+				7'h34: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
+				7'h35: {out[i+96], out[i+64], out[i+32], out[i]} = 9;
+				7'h36: {out[i+96], out[i+64], out[i+32], out[i]} = 6;
+				7'h37: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
+				7'h38: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
+				7'h39: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
+				7'h3A: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
+				7'h3B: {out[i+96], out[i+64], out[i+32], out[i]} = 4;
+				7'h3C: {out[i+96], out[i+64], out[i+32], out[i]} = 10;
+				7'h3D: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
+				7'h3E: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
+				7'h3F: {out[i+96], out[i+64], out[i+32], out[i]} = 14;
+
+				7'h40: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
+				7'h41: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
+				7'h42: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
+				7'h43: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
+				7'h44: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
+				7'h45: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
+				7'h46: {out[i+96], out[i+64], out[i+32], out[i]} = 11;
+				7'h47: {out[i+96], out[i+64], out[i+32], out[i]} = 6;
+				7'h48: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
+				7'h49: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
+				7'h4A: {out[i+96], out[i+64], out[i+32], out[i]} = 4;
+				7'h4B: {out[i+96], out[i+64], out[i+32], out[i]} = 10;
+				7'h4C: {out[i+96], out[i+64], out[i+32], out[i]} = 9;
+				7'h4D: {out[i+96], out[i+64], out[i+32], out[i]} = 14;
+				7'h4E: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
+				7'h4F: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
+
+				7'h50: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
+				7'h51: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
+				7'h52: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
+				7'h53: {out[i+96], out[i+64], out[i+32], out[i]} = 11;
+				7'h54: {out[i+96], out[i+64], out[i+32], out[i]} = 4;
+				7'h55: {out[i+96], out[i+64], out[i+32], out[i]} = 10;
+				7'h56: {out[i+96], out[i+64], out[i+32], out[i]} = 9;
+				7'h57: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
+				7'h58: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
+				7'h59: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
+				7'h5A: {out[i+96], out[i+64], out[i+32], out[i]} = 14;
+				7'h5B: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
+				7'h5C: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
+				7'h5D: {out[i+96], out[i+64], out[i+32], out[i]} = 6;
+				7'h5E: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
+				7'h5F: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
+
+				7'h60: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
+				7'h61: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
+				7'h62: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
+				7'h63: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
+				7'h64: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
+				7'h65: {out[i+96], out[i+64], out[i+32], out[i]} = 4;
+				7'h66: {out[i+96], out[i+64], out[i+32], out[i]} = 6;
+				7'h67: {out[i+96], out[i+64], out[i+32], out[i]} = 11;
+				7'h68: {out[i+96], out[i+64], out[i+32], out[i]} = 14;
+				7'h69: {out[i+96], out[i+64], out[i+32], out[i]} = 9;
+				7'h6A: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
+				7'h6B: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
+				7'h6C: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
+				7'h6D: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
+				7'h6E: {out[i+96], out[i+64], out[i+32], out[i]} = 10;
+				7'h6F: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
+
+				7'h70: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
+				7'h71: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
+				7'h72: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
+				7'h73: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
+				7'h74: {out[i+96], out[i+64], out[i+32], out[i]} = 14;
+				7'h75: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
+				7'h76: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
+				7'h77: {out[i+96], out[i+64], out[i+32], out[i]} = 11;
+				7'h78: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
+				7'h79: {out[i+96], out[i+64], out[i+32], out[i]} = 4;
+				7'h7A: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
+				7'h7B: {out[i+96], out[i+64], out[i+32], out[i]} = 10;
+				7'h7C: {out[i+96], out[i+64], out[i+32], out[i]} = 9;
+				7'h7D: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
+				7'h7E: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
+				7'h7F: {out[i+96], out[i+64], out[i+32], out[i]} = 6;
 			endcase
 	end
+	
+	assign outData = out;
 
 endmodule
