@@ -19,10 +19,10 @@ wire [2:0] fselect;
 
 assign fselect = select - 1;
 
-key_storage ksn(.clk(clk),.keyLock(keyLock), .in(nSboxToStorage),.roundKey(roundKey));
-key_storage ksf(.clk(clk),.keyLock(keyLock), .in(fSboxToStorage),.roundKey(froundKey));
-s_box fsbox(.inData(storageToFS_box),.outData(fSboxToStorage), .sel(fselect));
-s_box nsbox(.inData(storageToNS_box),.outData(nSboxToStorage), .sel(select));
+key_storage ksn(.clk(clk), .keyLock(keyLock), .in(nSboxToStorage), .roundKey(roundKey));
+key_storage ksf(.clk(clk), .keyLock(keyLock), .in(fSboxToStorage), .roundKey(froundKey));
+s_box fsbox(.inData(storageToFS_box), .outData(fSboxToStorage), .sel(fselect));
+s_box nsbox(.inData(storageToNS_box), .outData(nSboxToStorage), .sel(select));
 prekey_gen pg
 (
 	.clk(clk),
