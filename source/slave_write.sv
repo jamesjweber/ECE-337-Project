@@ -69,11 +69,11 @@ always_comb begin
     begin
       // HBURST: SINGLE, HTRANS: IDLE
       // Do not read data in IDLE state
-       write_error = 1'b0;
     end
 
     S2:
     begin
+
       // HBURST: SINGLE, HTRANS: BUSY
       // Nonsensical state, raise error
       write_error = 1'b1;
@@ -129,21 +129,21 @@ always_comb begin
         end else if (prev_HADDR[7:0] == 8'h38) begin
           // Plain Text Address (2/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
-            plain_text[63:32] = SWDATA;
+            plain_text[63:0] = {SWDATA,prev_text[31:0]};
           end else begin
             write_ready = 1'b0;
           end
         end else if (prev_HADDR[7:0] == 8'h3C) begin
           // Plain Text Address (3/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
-            plain_text[95:64] = SWDATA;
+            plain_text[95:0] = {SWDATA,prev_text[63:0]};
           end else begin
             write_ready = 1'b0;
           end
         end else if (prev_HADDR[7:0] == 8'h40) begin
           // Plain Text Address (4/4)
           if (fifo_full == 1'b0) begin // if FIFO is full don't wait to write
-            plain_text = SWDATA;
+            plain_text[127:0] = {SWDATA,prev_text[95:0]};
             write_out = 1'b1;
           end else begin
             write_ready = 1'b0;

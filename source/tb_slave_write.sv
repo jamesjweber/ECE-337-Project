@@ -280,7 +280,7 @@ module tb_slave_write();
     @(posedge tb_HCLK)
     tb_SWDATA = 32'h45678900;
     // For next (next) test case
-		tb_HADDR = 32'h20;
+		tb_HADDR = 32'h24;
     
     if (tb_key == 128'h44444444333333332222222211111111 && 
 				tb_nonce == 128'h345678902345678912345678 && 
@@ -298,12 +298,12 @@ module tb_slave_write();
     
     // Test Case 10 - S3, Nonce 4/4
     tb_test_num += 1;
-    tb_test_case =	"S3, Nonce 3/4";
+    tb_test_case =	"S3, Nonce 4/4";
     
     @(posedge tb_HCLK)
     tb_SWDATA = 32'h10101010;
     // For next (next) test case
-		tb_HADDR = 32'h24;
+		tb_HADDR = 32'h34;
     
     if (tb_key == 128'h44444444333333332222222211111111 && 
 				tb_nonce == 128'h45678900345678902345678912345678 && 
@@ -325,7 +325,7 @@ module tb_slave_write();
     @(posedge tb_HCLK)
     tb_SWDATA = 32'h1;
     // For next (next) test case
-		tb_HADDR = 32'h28;
+		tb_HADDR = 32'h38;
     
     if (tb_key == 128'h44444444333333332222222211111111 && 
 				tb_nonce == 128'h45678900345678902345678912345678 && 
@@ -347,7 +347,7 @@ module tb_slave_write();
     @(posedge tb_HCLK)
     tb_SWDATA = 32'h2;
     // For next (next) test case
-		tb_HADDR = 32'h2C;
+		tb_HADDR = 32'h3C;
     
     if (tb_key == 128'h44444444333333332222222211111111 && 
 				tb_nonce == 128'h45678900345678902345678912345678 && 
@@ -367,14 +367,14 @@ module tb_slave_write();
     tb_test_case =	"Plain Text (2/4)";
     
     @(posedge tb_HCLK)
-    tb_SWDATA = 32'h2;
+    tb_SWDATA = 32'h3;
     // For next (next) test case
-		tb_HADDR = 32'h2C;
+		tb_HADDR = 32'h40;
     
     if (tb_key == 128'h44444444333333332222222211111111 && 
 				tb_nonce == 128'h45678900345678902345678912345678 && 
 				tb_destination == 32'h10101010 && 
-				tb_plain_text == 128'h1 && 
+				tb_plain_text == 128'h200000001 && 
 				tb_write_out == 1'b0 && 
 				tb_write_error == 1'b0 &&
 				tb_write_ready == 1'b1) 
@@ -384,6 +384,67 @@ module tb_slave_write();
       $display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);
     end
     
+    // Test Case 14- S3, Plain Text (3/4)
+    tb_test_num += 1;
+    tb_test_case =	"Plain Text (3/4)";
+    
+    @(posedge tb_HCLK)
+    tb_SWDATA = 32'h4;
+    
+    if (tb_key == 128'h44444444333333332222222211111111 && 
+				tb_nonce == 128'h45678900345678902345678912345678 && 
+				tb_destination == 32'h10101010 && 
+				tb_plain_text == 128'h30000000200000001 && 
+				tb_write_out == 1'b0 && 
+				tb_write_error == 1'b0 &&
+				tb_write_ready == 1'b1) 
+		begin
+      $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
+    end else begin
+      $display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);
+    end
+    
+    // Test Case 15- S3, Plain Text (4/4)
+    tb_test_num += 1;
+    tb_test_case =	"Plain Text (4/4)";
+    
+    @(posedge tb_HCLK)
+    
+    if (tb_key == 128'h44444444333333332222222211111111 && 
+				tb_nonce == 128'h45678900345678902345678912345678 && 
+				tb_destination == 32'h10101010 && 
+				tb_plain_text == 128'h4000000030000000200000001 && 
+				tb_write_out == 1'b1 && 
+				tb_write_error == 1'b0 &&
+				tb_write_ready == 1'b1) 
+		begin
+      $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
+    end else begin
+      $display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);
+    end
+    
+    // Test Case 16 - Final Reset
+    tb_test_num += 1;
+    tb_test_case =	"Final Reset";
+    
+    tb_HRESETn = 1'b1;
+    @(posedge tb_HCLK)
+    tb_HRESETn = 1'b0;
+    @(posedge tb_HCLK)
+    
+    if (tb_key == 128'h0 && 
+				tb_nonce == 128'h0 && 
+				tb_destination == 32'h0 && 
+				tb_plain_text == 128'h0 && 
+				tb_write_out == 1'b0 && 
+				tb_write_error == 1'b0 &&
+				tb_write_ready == 1'b1) 
+		begin
+      $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
+    end else begin
+      $display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);
+    end
+    
+    
   end
-  
 endmodule
