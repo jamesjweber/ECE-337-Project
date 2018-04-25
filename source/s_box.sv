@@ -10,7 +10,7 @@ module s_box
 
 	always_comb
 	begin
-		for(i = 3; i < 128; i += 4)
+		for(i = 0; i < 32; i += 1)
 			case (sel)
 				0: // [3 8 15 1 10 6 5 11 14 13 4 2 7 0 9 12]
 					case ({inData[i+96], inData[i+64], inData[i+32], inData[i]})
