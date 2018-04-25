@@ -26,7 +26,7 @@ reg [31:0] 	prev_HADDR;
 reg [127:0] prev_key;
 reg [127:0] prev_nonce;
 reg [31:0] 	prev_dest;
-reg [127:0] prev_text; 
+reg [127:0] prev_text;
 
 
 always_ff @ (posedge HCLK, posedge HSELx, negedge HRESETn) begin
@@ -88,7 +88,7 @@ always_comb begin
       nonce = prev_nonce;
       destination = prev_dest;
       plain_text = prev_text;
-      
+
       if (HREADY == 1'b1) begin
         // If ready write to address
         // Choose to not use address 0x00 so data would not be accidentally overwritten.
@@ -288,8 +288,8 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-       
-			  
+
+
     end
 
     S19:

@@ -24,24 +24,24 @@ s_box
 (
 	.sel(),
 	.inData(),
-	output wire [127:0] outData
+	.outData()
 );
 
 linear_mix
 (
-	input wire [31:0] A,
-	input wire [31:0] B,
-	input wire [31:0] C,
-	input wire [31:0] D,
-	output wire [31:0] newA,
-	output wire [31:0] newB,
-	output wire [31:0] newC,
-	output wire [31:0] newD
+	.A(),
+	.B(),
+	.C(),
+	.D(),
+	.newA(),
+	.newB(),
+	.newC(),
+	.newD()
 );
 
 key_mix
 (
-	input wire [127:0] key,
-	input wire [127:0] data,
-	output wire [127:0] modData
+	.key(),
+	.data(),
+	.modData()
 );

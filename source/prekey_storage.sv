@@ -22,11 +22,11 @@ always_ff @ (posedge clk)
 begin
 	if(rst == 1)
 	begin
-		pKeyMinus8 <= {1'b1,keyIn[30:0]};
-		pKeyMinus7 <= keyIn[62:31];	
-		pKeyMinus6 <= keyIn[94:63];	
-		pKeyMinus5 <= keyIn[126:95];	
-		pKeyMinus4 <= {keyIn[127],31'h0};
+		pKeyMinus8 <= keyIn[31:0];
+		pKeyMinus7 <= keyIn[63:32];	
+		pKeyMinus6 <= keyIn[95:64];	
+		pKeyMinus5 <= keyIn[127:96];	
+		pKeyMinus4 <= 32'h1;
 		pKeyMinus3 <= 32'h0;
 		pKeyMinus2 <= 32'h0;
 		pKeyMinus1 <= 32'h0;
@@ -45,7 +45,7 @@ begin
 end
 
 assign gen_preKeys = {pKeyMinus8, pKeyMinus5, pKeyMinus3, pKeyMinus1};
-assign pre_froundKeys = {pKeyMinus4, pKeyMinus3, pKeyMinus2, pKeyMinus1};
-assign pre_roundKeys = {pKeyMinus8, pKeyMinus7, pKeyMinus6, pKeyMinus5};
+assign pre_froundKeys = {pKeyMinus1, pKeyMinus2, pKeyMinus3, pKeyMinus4};
+assign pre_roundKeys = {pKeyMinus5, pKeyMinus6, pKeyMinus7, pKeyMinus8};
 
 endmodule
