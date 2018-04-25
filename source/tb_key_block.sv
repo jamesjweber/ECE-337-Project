@@ -23,7 +23,7 @@ module tb_key_block();
 	// Declare DUT portmap signals
 	reg tb_clk;
 	reg tb_rst;
-	reg [3:0] tb_select;
+	reg [2:0] tb_select;
 	reg [127:0] tb_in;
 	reg [127:0] tb_roundKey;
 	reg [127:0] tb_froundKey;
