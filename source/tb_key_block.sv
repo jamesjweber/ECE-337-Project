@@ -232,13 +232,5 @@ module tb_key_block();
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		@(posedge tb_clk);
-
-
-
-
 	end
-	
-
-
-
 endmodule

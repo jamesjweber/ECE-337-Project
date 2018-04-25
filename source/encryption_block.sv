@@ -22,8 +22,8 @@ key_block
 
 s_box
 (
-	input wire [2:0] sel,
-	input wire [127:0] inData,
+	.sel(),
+	.inData(),
 	output wire [127:0] outData
 );
 
