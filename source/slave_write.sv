@@ -22,23 +22,34 @@ typedef enum bit [4:0] {S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15,S16,S
 
 // Internal Signals
 stateType state;
-stateType next_state;
-reg [31:0] prev_HADDR;
+reg [31:0] 	prev_HADDR;
+reg [127:0] prev_key;
+reg [127:0] prev_nonce;
+reg [31:0] 	prev_dest;
+reg [127:0] prev_text; 
 
 
 always_ff @ (posedge HCLK, posedge HSELx, negedge HRESETn) begin
   if (HRESETn == 1'b0 && HSELx == 1'b1) begin // If selected and not being reset
-    $display("[STATE]: %s <= %s :[NEXT_STATE]",state, next_state);
-    state <= next_state;
-    $display("[NEW_STATE]: %s <= %s :[NEXT_STATE]",state, next_state);
     prev_HADDR <= HADDR;
+    prev_key   <= key;
+    prev_nonce <= nonce;
+    prev_dest  <= destination;
+    prev_text  <= plain_text;
   end else begin // Else if being reset and/or not currently selected
     state <= S1;
-    //write_ready = 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
+    // write_ready = 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
     prev_HADDR <= 32'b0;
+    prev_key 	 <= 128'b0;
+    prev_nonce <= 128'b0;
+    prev_dest  <= 32'b0;
+    prev_text  <= 128'b0;
   end
 end
 
+always_ff @ (posedge HCLK, HBURST, HTRANS) begin
+	convert({HBURST, HTRANS}, state); // Set next state
+end
 
 always_comb begin
 
@@ -46,8 +57,7 @@ always_comb begin
   nonce = 128'b0;
   destination = 32'b0;
   plain_text = 128'b0;
-  next_state = state;
-  write_error = 1'b0;
+  //write_error = 1'b0;
   write_ready = 1'b1;
   write_out = 1'b0;
 
@@ -59,11 +69,7 @@ always_comb begin
     begin
       // HBURST: SINGLE, HTRANS: IDLE
       // Do not read data in IDLE state
-      convert({HBURST, HTRANS}, next_state); // Set next state
-      $display("next state(S1): %s", next_state);
-			if (HREADY != 1'b1 && state != next_state) begin
-				write_error = 1'b1;
-			end
+       write_error = 1'b0;
     end
 
     S2:
@@ -71,47 +77,45 @@ always_comb begin
       // HBURST: SINGLE, HTRANS: BUSY
       // Nonsensical state, raise error
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-      $display("next state(S2): %s", next_state);
-			if (HREADY != 1'b1 && state != next_state) begin
-				write_error = 1'b1;
-			end
     end
 
     S3:
     begin
       // HBURST: SINGLE, HTRANS: NONSEQ
       // Single burst write
+      write_error = 1'b0;
+      key = prev_key;
+      nonce = prev_nonce;
+      destination = prev_dest;
+      plain_text = prev_text;
+      
       if (HREADY == 1'b1) begin
         // If ready write to address
-				$display("GUCCI");
-				$display("prev_HADDR[7:0]: %h", prev_HADDR[7:0]);
         // Choose to not use address 0x00 so data would not be accidentally overwritten.
         if (prev_HADDR[7:0] == 8'h04) begin
           // Key Address (1/4)
-          $display("GUCCI GANG");
           key[31:0] = SWDATA;
-        end if (prev_HADDR[7:0] == 8'h08) begin
+        end else if (prev_HADDR[7:0] == 8'h08) begin
           // Key Address (2/4)
-          key[63:31] = SWDATA;
-        end if (prev_HADDR[7:0] == 8'h0C) begin
+          key[63:0] = {SWDATA,prev_key[31:0]};
+        end else if (prev_HADDR[7:0] == 8'h0C) begin
           // Key Address (3/4)
-          key[95:64] = SWDATA;
-        end if (prev_HADDR[7:0] == 8'h10) begin
-          // Key Address
-          key[127:96] = SWDATA;
+          key[95:0] = {SWDATA,prev_key[63:0]};
+        end else if (prev_HADDR[7:0] == 8'h10) begin
+          // Key Address (4/4)
+          key[127:0] = {SWDATA,prev_key[95:0]};
         end else if (prev_HADDR[7:0] == 8'h14) begin
           // Nonce Address (1/4)
           nonce[31:0] = SWDATA;
         end else if (prev_HADDR[7:0] == 8'h18) begin
           // Nonce Address (2/4)
-          nonce[63:32] = SWDATA;
+          nonce[63:0] = {SWDATA,prev_nonce[31:0]};
         end else if (prev_HADDR[7:0] == 8'h1C) begin
           // Nonce Address (3/4)
-          nonce[95:64] = SWDATA;
+          nonce[95:0] = {SWDATA,prev_nonce[63:0]};
         end else if (prev_HADDR[7:0] == 8'h20) begin
           // Nonce Address (4/4)
-          nonce[127:96] = SWDATA;
+          nonce[127:0] = {SWDATA,prev_nonce[95:0]};
         end else if (prev_HADDR[7:0] == 8'h24) begin
           // Destination Address (1/1)
           destination = SWDATA;
@@ -146,14 +150,11 @@ always_comb begin
           end
         end else begin
           // Invalid Address
+          $display("INVALID ADDRESS: %h", prev_HADDR[7:0]);
           write_error = 1'b1;
         end
       end
-			convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
+
     end
 
     S4:
@@ -161,11 +162,6 @@ always_comb begin
       // HBURST: SINGLE, HTRANS: SEQ
       // Nonsensical state, raise error
       write_error = 1'b1;
-       convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S5:
@@ -175,11 +171,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S6:
@@ -189,11 +180,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S7:
@@ -230,11 +216,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S11:
@@ -244,11 +225,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S12:
@@ -267,11 +243,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S14:
@@ -281,11 +252,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S15:
@@ -295,11 +261,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S16:
@@ -309,11 +270,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S17:
@@ -323,11 +279,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S18:
@@ -337,11 +288,8 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
+       
+			  
     end
 
     S19:
@@ -351,11 +299,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S20:
@@ -365,11 +308,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S21:
@@ -379,11 +317,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S22:
@@ -393,11 +326,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S23:
@@ -416,11 +344,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S25:
@@ -430,11 +353,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S26:
@@ -444,11 +362,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S27:
@@ -458,11 +371,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S28:
@@ -472,11 +380,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S29:
@@ -486,11 +389,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S30:
@@ -500,11 +398,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S31:
@@ -514,11 +407,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
     S32:
@@ -528,11 +416,6 @@ always_comb begin
 
       // Not supported
       write_error = 1'b1;
-      convert({HBURST, HTRANS}, next_state); // Set next state
-			if (HREADY != 1'b1 && state != next_state) begin
-				next_state = state;
-				write_error = 1'b1;
-			end
     end
 
   endcase
@@ -543,7 +426,6 @@ task convert;
 input reg [4:0] numeric_state;
 output stateType state;
 begin
-	$display("........CONVERTING...........");
 	case (numeric_state)
     5'b00000: state = S1;
     5'b00001: state = S2;
