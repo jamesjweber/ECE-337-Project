@@ -36,7 +36,7 @@ assign ready = read_ready && write_ready; // and future response signals
 
 // Internal Blocks
 transfer_response TR(HCLK, HRESETn, HSELx, ready, error, HREADY, HRESP);
-size_control SC(HCLK, HRESETn, HSLEx, HWDATA, HSIZE, SWDATA, size_control_error);
+size_control SC(HSLEx, HWDATA, HSIZE, SWDATA, size_control_error);
 slave_write SW(HCLK, HRESETn, HSLEx, HADDR, HBURST, HTRANS, HREADY, fifo_full, SWDATA, key, nonce, destination, plain_text, write_error, write_ready, write_out);
 
 endmodule // ahb_lite_slave_interface
