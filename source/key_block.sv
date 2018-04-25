@@ -15,7 +15,6 @@ wire [127:0] storageToNS_box;
 wire [127:0] storageToFS_box;
 wire [127:0] fSboxToStorage;
 wire [127:0] nSboxToStorage;
-
 wire [2:0] fselect;
 
 assign fselect = select - 1;
