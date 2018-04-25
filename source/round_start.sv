@@ -1,7 +1,7 @@
 module round_start
 (
 	input wire clk,
-	input wire init,
+	input wire rst,
 	input wire [128:0] freshData,
 	input wire [128:0] priorRound,
 	output wire [128:0] dataOut
@@ -15,13 +15,22 @@ wire dataSelect;
 
 always_ff @ (posedge clk)
 begin
-	currentData <= dataMinus1;
-	dataMinus1 <= dataMinus2;
-	dataMinus2 <= dataMinus3;
-	dataMinus3 <= dataSelect;
+	if (rst == 1)
+	begin
+		currentData <= freshData;
+		dataMinus1 <= freshData + 1;
+		dataMinus2 <= freshData + 2;
+		dataMinus3 <= freshData + 3;
+	end
+	else
+	begin
+		currentData <= dataMinus1;
+		dataMinus1 <= dataMinus2;
+		dataMinus2 <= dataMinus3;
+		dataMinus3 <= priorRound;
+	end
 end
 
-assign dataSelect = init ? freshData: priorRound;
 assign dataOut = currentData;
 
 endmodule
