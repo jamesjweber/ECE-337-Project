@@ -34,11 +34,11 @@ module fifo_buffer
 			curr_write <= next_write;
 			curr_empty <= next_empty;
 			curr_full <= next_full;
-		end
 
-		// Read or write new values.
-		out <= (read & ~empty) | (read & write) ? buffer[curr_read] : out;
-		buffer[curr_write] <= (write & ~full) | (read & write) ? dataIn : buffer[curr_write];
+			// Read or write new values.
+			out <= (read & ~empty) | (read & write) ? buffer[curr_read] : out;
+			buffer[curr_write] <= (write & ~full) | (read & write) ? dataIn : buffer[curr_write];
+		end
 
 	end
 
