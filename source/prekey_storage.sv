@@ -22,11 +22,11 @@ always_ff @ (posedge clk)
 begin
 	if(rst == 1)
 	begin
-		pKeyMinus8 <= keyIn[31:0];
-		pKeyMinus7 <= keyIn[63:32];	
-		pKeyMinus6 <= keyIn[95:64];	
-		pKeyMinus5 <= keyIn[127:96];	
-		pKeyMinus4 <= 32'h1;
+		pKeyMinus8 <= {1'b1,keyIn[30:0]};
+		pKeyMinus7 <= keyIn[62:31];	
+		pKeyMinus6 <= keyIn[94:63];	
+		pKeyMinus5 <= keyIn[126:95];	
+		pKeyMinus4 <= {keyIn[127],31'h0};
 		pKeyMinus3 <= 32'h0;
 		pKeyMinus2 <= 32'h0;
 		pKeyMinus1 <= 32'h0;
