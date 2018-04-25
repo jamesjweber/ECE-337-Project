@@ -7,12 +7,12 @@ module flex_counter
 	input wire n_rst,
 	input wire clear,
 	input wire count_enable,
-	input wire [NUM_CNT_BITS - 1:0]rollover_val,
-	output wire [NUM_CNT_BITS - 1:0]count_out
+	input wire [7:0] rollover_val,
+	output wire [7:0] count_out
 );
 
-	reg [NUM_CNT_BITS - 1:0]cur_count = 0;
-	reg [NUM_CNT_BITS - 1:0]nxt_count = 0;
+	reg [7:0] cur_count = 0;
+	reg [7:0] nxt_count = 0;
 
 	always_ff @ (posedge clk, negedge n_rst)
 	begin : FF_LOGIC
