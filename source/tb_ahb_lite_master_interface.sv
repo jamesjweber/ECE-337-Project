@@ -5,6 +5,10 @@
 module tb_ahb_lite_master_interface();
 
   // Define parameters
+<<<<<<< HEAD
+  // basic test bench parameters
+=======
+>>>>>>> 95c8b32944c1f3f3e04bce56f40e16c6ae1674be
   localparam	CLK_PERIOD		= 5.0;
   localparam 	AHB_BUS_SIZE 	= 32;
 
@@ -59,6 +63,10 @@ module tb_ahb_lite_master_interface();
 	// Test bench process
   initial
   begin
+<<<<<<< HEAD
+  $display("me and my grandma take meds, ooh");
+=======
+>>>>>>> 95c8b32944c1f3f3e04bce56f40e16c6ae1674be
     // Initialize all of the test inputs
     tb_HRESETn      = 1'b1;		// Initialize to be inactive
     tb_HREADY		    = 1'b1; 	// Initialize to be high (ready)
