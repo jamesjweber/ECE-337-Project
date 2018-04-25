@@ -7,14 +7,14 @@ module serpent_fsm
 	output wire [2:0] keyBoxSelect,
 	output wire [5:0] round,
 	output wire done,
-	output wire rst
+	output wire rst,
+	output wire keyLock
 );
 
 typedef enum bit [3:0] {IDLE, START, R0, R1, R2, R3, R4, R5, R6, NR7, FR7, END} stateType;
 stateType state;
 stateType nextState;
-reg [1:0] tick;
-wire [1:0] tock;
+reg [3:0] tick;
 always_ff @ (negedge n_rst, posedge clk)
 begin
 	if(1'b0 == n_rst)
@@ -49,10 +49,12 @@ begin
 		end
 	end
 	START:begin
-		if(tick == 3)
+		keyLock = 0;
+		if(tick == 7)
 		begin
 			nextState = R1;
 			tick = 0;
+			keyLock = 1;
 		end
 		else
 		begin
@@ -61,6 +63,7 @@ begin
 		end
 	end
 	R1:begin
+		keyLock = 0;
 		if(tick == 3)
 		begin
 			nextState = R2;
@@ -68,6 +71,7 @@ begin
 			round = round + 1;
 			sBoxSelect = sBoxSelect + 1;
 			keyBoxSelect = keyBoxSelect - 1; 
+			keyLock = 1;
 		end
 		else
 		begin
@@ -76,6 +80,7 @@ begin
 		end
 	end
 	R2:begin
+		keyLock = 0;
 		if(tick == 3)
 		begin
 			nextState = R3;
@@ -83,6 +88,7 @@ begin
 			round = round + 1;
 			sBoxSelect = sBoxSelect + 1;
 			keyBoxSelect = keyBoxSelect - 1;
+			keyLock = 1;
 		end
 		else
 		begin
@@ -91,6 +97,7 @@ begin
 		end
 	end
 	R3:begin
+		keyLock = 0;
 		if(tick == 3)
 		begin
 			nextState = R4;
@@ -98,6 +105,7 @@ begin
 			round = round + 1;
 			sBoxSelect = sBoxSelect + 1;
 			keyBoxSelect = keyBoxSelect - 1;
+			keyLock = 1;
 		end
 		else
 		begin
@@ -106,6 +114,7 @@ begin
 		end
 	end
 	R4:begin
+		keyLock = 0;
 		if(tick == 3)
 		begin
 			nextState = R5;
@@ -113,6 +122,7 @@ begin
 			round = round + 1;
 			sBoxSelect = sBoxSelect + 1;
 			keyBoxSelect = keyBoxSelect - 1;
+			keyLock = 1;
 		end
 		else
 		begin
@@ -121,6 +131,7 @@ begin
 		end
 	end
 	R5:begin
+		keyLock = 0;
 		if(tick == 3)
 		begin
 			nextState = R6;
@@ -128,6 +139,7 @@ begin
 			round = round + 1;
 			sBoxSelect = sBoxSelect + 1;
 			keyBoxSelect = keyBoxSelect - 1;
+			keyLock = 1;
 		end
 		else
 		begin
@@ -136,6 +148,7 @@ begin
 		end
 	end	
 	R6:begin
+		keyLock = 0;
 		if(tick == 3 && round > 29)
 		begin
 			nextState = FR7;
@@ -143,6 +156,7 @@ begin
 			round = round + 1;
 			sBoxSelect = sBoxSelect + 1;
 			keyBoxSelect = keyBoxSelect - 1;
+			keyLock = 1;
 		end
 		else if(tick == 3)
 		begin
@@ -150,6 +164,7 @@ begin
 			tick = 0;
 			round = round + 1;
 			sBoxSelect = sBoxSelect + 1;
+			keyLock = 1;
 		end
 		else
 		begin
@@ -158,6 +173,7 @@ begin
 		end
 	end
 	NR7:begin
+		keyLock = 0;
 		if(tick == 3)
 		begin
 			nextState = R0;
@@ -165,6 +181,7 @@ begin
 			round = round + 1;
 			sBoxSelect = sBoxSelect + 1;
 			keyBoxSelect = keyBoxSelect - 1;
+			keyLock = 1;
 		end
 		else
 		begin
@@ -173,6 +190,7 @@ begin
 		end
 	end
 	FR7:begin
+		keyLock = 0;
 		if(tick == 3)
 		begin
 			nextState = END;
@@ -180,6 +198,7 @@ begin
 			round = round + 1;
 			sBoxSelect = sBoxSelect + 1;
 			keyBoxSelect = keyBoxSelect - 1;
+			keyLock = 1;
 		end
 		else
 		begin
@@ -188,6 +207,7 @@ begin
 		end
 	end
 	END:begin
+		keyLock = 0;
 		if(tick == 3)
 		begin
 			nextState = START;
