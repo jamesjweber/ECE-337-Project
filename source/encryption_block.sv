@@ -3,7 +3,7 @@ module encryption_block
 	input wire clk,
 	input wire rst,
 	input wire keyLock,
-	input wire go,
+	input wire fsmGo,
 	input wire [2:0] keySelect,
 	input wire [2:0] encSelect,
 	input wire [4:0] count,
@@ -24,7 +24,7 @@ wire [127:0] prbs;
 round_start rs(
 	.clk(clk),
 	.rst(rst),
-	.go(go),
+	.go(fsmGo),
 	.freshData(nonceIn),
 	.priorRound(lMixOut),
 	.dataOut(roundStartOut)

@@ -49,7 +49,7 @@ module tb_encryption_block();
 	end
 	
 	// DUT Port map
-	encryption_block DUT(.clk(tb_clk), .rst(tb_rst), .keyLock(tb_keyLock), .go(tb_go), .done(tb_done), .count(tb_count), .keySelect(tb_keySelect), .encSelect(tb_encSelect), .keyIn(tb_keyIn), .nonceIn(tb_nonceIn), .pText(tb_pText), .encText(tb_encText));
+	encryption_block DUT(.clk(tb_clk), .rst(tb_rst), .keyLock(tb_keyLock), .fsmGo(tb_go), .done(tb_done), .count(tb_count), .keySelect(tb_keySelect), .encSelect(tb_encSelect), .keyIn(tb_keyIn), .nonceIn(tb_nonceIn), .pText(tb_pText), .encText(tb_encText));
 	// Test bench main process
 	initial
 	begin
@@ -80,6 +80,15 @@ module tb_encryption_block();
 		tb_keyLock = 0;
 		tb_go = 1;
 		tb_keySelect = tb_keySelect - 1; 	
+		@(posedge tb_clk);		
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+		tb_keyLock = 1;
+		@(posedge tb_clk);
+		tb_keyLock = 0;
+		tb_keySelect = tb_keySelect - 1;
+		tb_encSelect = tb_encSelect + 1;
+		tb_count = tb_count + 1;
 		@(posedge tb_clk);		
 		@(posedge tb_clk);
 		@(posedge tb_clk);

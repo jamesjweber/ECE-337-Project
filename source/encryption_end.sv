@@ -12,9 +12,10 @@ reg [127:0] currentData;
 reg [127:0] dataMinus1;
 reg [127:0] dataMinus2;
 reg [127:0] dataMinus3;
-
+reg [4:0] prevCount;
 always_ff @ (posedge clk)
 begin
+	prevCount <= count;
 	currentData <= dataMinus1;
 	dataMinus1 <= dataMinus2;
 	dataMinus2 <= dataMinus3;
@@ -22,5 +23,5 @@ begin
 end
 
 assign dataOut = currentData ^ pText;
-assign done = count == 31 ? 1:0;
+assign done = count == 0 && prevCount == 31 ? 1:0;
 endmodule

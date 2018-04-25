@@ -12,7 +12,6 @@ reg [127:0] currentData;
 reg [127:0] dataMinus1;
 reg [127:0] dataMinus2;
 reg [127:0] dataMinus3;
-wire dataSelect;
 
 always_ff @ (posedge clk)
 begin
@@ -30,6 +29,14 @@ begin
 		dataMinus2 <= dataMinus3;
 		dataMinus3 <= priorRound;
 	end
+	else
+	begin
+		currentData <= currentData;
+		dataMinus1 <= dataMinus1;
+		dataMinus2 <= dataMinus2;
+		dataMinus3 <= dataMinus3;
+	end
+		
 end
 
 assign dataOut = currentData;
