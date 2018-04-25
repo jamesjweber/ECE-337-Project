@@ -23,8 +23,7 @@ module tb_key_block();
 	// Declare DUT portmap signals
 	reg tb_clk;
 	reg tb_rst;
-	reg tb_keyLock;
-	reg [2:0] tb_select;
+	reg [3:0] tb_select;
 	reg [127:0] tb_in;
 	reg [127:0] tb_roundKey;
 	reg [127:0] tb_froundKey;
@@ -44,7 +43,7 @@ module tb_key_block();
 	end
 	
 	// DUT Port map
-	key_block DUT(.clk(tb_clk), .rst(tb_rst), .keyLock(tb_keyLock), .select(tb_select), .in(tb_in), .roundKey(tb_roundKey), .froundKey(tb_froundKey));
+	key_block DUT(.clk(tb_clk), .rst(tb_rst), .select(tb_select), .in(tb_in), .roundKey(tb_roundKey), .froundKey(tb_froundKey));
 	// Test bench main process
 	initial
 	begin
@@ -67,30 +66,6 @@ module tb_key_block();
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		@(posedge tb_clk);
-		tb_keyLock = 1;
-		@(posedge tb_clk);
-		tb_keyLock = 0;
-		tb_select = tb_select - 1; 	
-		@(posedge tb_clk);		
-		@(posedge tb_clk);
-		@(posedge tb_clk);
-		tb_keyLock = 1;
-		@(posedge tb_clk);
-		tb_keyLock = 0;
-		tb_select = tb_select - 1;
-		@(posedge tb_clk);		
-		@(posedge tb_clk);
-		@(posedge tb_clk);
-		@(posedge tb_clk);
-		tb_select = tb_select - 1;
-		@(posedge tb_clk);		
-		@(posedge tb_clk);
-		@(posedge tb_clk);
-		@(posedge tb_clk);
-		tb_select = tb_select - 1;
-		@(posedge tb_clk);		
-		@(posedge tb_clk);
-		@(posedge tb_clk);
 		@(posedge tb_clk);
 		tb_select = tb_select - 1; 	
 		@(posedge tb_clk);		
@@ -232,5 +207,33 @@ module tb_key_block();
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		@(posedge tb_clk);
+		tb_select = tb_select - 1; 	
+		@(posedge tb_clk);		
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+		tb_select = tb_select - 1;
+		@(posedge tb_clk);		
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+		tb_select = tb_select - 1;
+		@(posedge tb_clk);		
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+		tb_select = tb_select - 1;
+		@(posedge tb_clk);		
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+
+
+
+
 	end
+	
+
+
+
 endmodule
