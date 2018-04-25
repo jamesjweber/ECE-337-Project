@@ -45,7 +45,7 @@ begin
 end
 
 assign gen_preKeys = {pKeyMinus8, pKeyMinus5, pKeyMinus3, pKeyMinus1};
-assign pre_froundKeys = {pKeyMinus1, pKeyMinus2, pKeyMinus3, pKeyMinus4};
-assign pre_roundKeys = {pKeyMinus5, pKeyMinus6, pKeyMinus7, pKeyMinus8};
+assign pre_froundKeys = {pKeyMinus4, pKeyMinus3, pKeyMinus2, pKeyMinus1};
+assign pre_roundKeys = {pKeyMinus8, pKeyMinus7, pKeyMinus6, pKeyMinus5};
 
 endmodule
