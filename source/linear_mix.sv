@@ -9,6 +9,13 @@ module linear_mix
 	output wire [31:0] newC,
 	output wire [31:0] newD
 );
+wire [31:0] tA1;
+wire [31:0] tB1;
+wire [31:0] tC1;
+wire [31:0] tD1;
+wire [31:0] tA2;
+wire [31:0] tC2;
+
 
 	assign tA1 = {A[17:0], A[31:18]}; // 13-bit left rotation.
 	assign tC1 = {C[28:0], C[31:29]}; // 3-bit left rotation.
