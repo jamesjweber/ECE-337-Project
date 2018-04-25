@@ -83,8 +83,4 @@ module fifo_buffer
 	assign full = curr_full;
 	assign dataOut = out;
 
-<<<<<<< HEAD
 endmodule
-=======
-endmodule
->>>>>>> 95c8b32944c1f3f3e04bce56f40e16c6ae1674be
