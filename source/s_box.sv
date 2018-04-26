@@ -11,7 +11,7 @@ module s_box
 	always_comb
 	begin
 		for(i = 0; i < 32; i += 1)
-			case ({sel, {inData[i+96], inData[i+64], inData[i+32], inData[i]}})
+			case ({sel, inData[i+96], inData[i+64], inData[i+32], inData[i]})
 				7'h00: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
 				7'h01: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
 				7'h02: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
