@@ -15,7 +15,7 @@ controlled_encryption_block ceb(
 
 fifo_buffer fb(
 	.clk(clk),
-	.clk (nRst),
+	.nRst(nRst),
 	.read(done),
 	.write(), //something something AHB
 	.dataIn(), //something something AHB
