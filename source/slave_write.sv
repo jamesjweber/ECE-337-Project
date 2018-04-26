@@ -27,12 +27,8 @@ reg [127:0] prev_key;
 reg [127:0] prev_nonce;
 reg [31:0] 	prev_dest;
 reg [127:0] prev_text;
-reg valid;
 
-// always_ff @ (negedge HRESETn
-assign valid = ~HRESETn && HSELx;
-
-always_ff @ (posedge HCLK or posedge valid) begin
+always_ff @ (posedge HCLK, posedge HRESETn) begin
   if (valid) begin // If selected and not being reset
     prev_HADDR <= HADDR;
     prev_key   <= key;
@@ -56,11 +52,11 @@ end
 
 always_comb begin
 
-  key = 128'b0;
-  nonce = 128'b0;
-  destination = 32'b0;
-  plain_text = 128'b0;
-  //write_error = 1'b0;
+  key = prev_key;
+  nonce = prev_nonce;
+  destination = prev_dest;
+  plain_text = prev_text;
+  write_error = 1'b0;
   write_ready = 1'b1;
   write_out = 1'b0;
 
