@@ -39,6 +39,7 @@ always_ff @ (posedge HCLK, negedge HRESETn) begin
     state <= nextState;
   end else begin // Else if being reset and/or not currently selected
     state <= S1;
+    prev_HADDR <= 32'b0;
     prev_key 	 <= 128'b0;
     prev_nonce <= 128'b0;
     prev_dest  <= 32'b0;
