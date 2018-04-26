@@ -58,7 +58,7 @@ always_comb begin
   write_error = 1'b0;
   write_ready = 1'b1;
   write_out = 1'b0;
-  
+
   if (HTRANS == 2'b0) begin
   	nextState = S1;
   end else if (HTRANS == 2'b1) begin
@@ -68,7 +68,7 @@ always_comb begin
  	end else begin
  		nextState = S4;
  	end
- 	
+
   casez (state)
 
     S1:
@@ -216,7 +216,7 @@ begin
     5'b11111: nstate = S32;
     default: nstate = S1;
 	endcase
-end 
+end
 endtask */
 
 endmodule // slave_write
