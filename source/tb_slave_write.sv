@@ -5,7 +5,7 @@
 module tb_slave_write();
 	
 	// Define parameters
-  localparam	CLK_PERIOD		= 5.0;
+  localparam	CLK_PERIOD		= 2.5;
   localparam 	AHB_BUS_SIZE 	= 32;
   
   // Slave Write Signals
@@ -34,9 +34,9 @@ module tb_slave_write();
   always
   begin
     tb_HCLK = 1'b0;
-    #(CLK_PERIOD/3.0);
+    #(CLK_PERIOD/4.0);
     tb_HCLK = 1'b1;
-    #(CLK_PERIOD/3.0);
+    #(CLK_PERIOD/4.0);
   end
   
   slave_write DUT(
@@ -74,6 +74,7 @@ module tb_slave_write();
     tb_test_num = 0;
     tb_test_case = "Test bench initializaton";
    	$display("%s: Case %1d", tb_test_case, tb_test_num);
+    @(posedge tb_HCLK)
     @(posedge tb_HCLK)
 
 
@@ -437,7 +438,7 @@ module tb_slave_write();
 				tb_destination == 32'h0 && 
 				tb_plain_text == 128'h0 && 
 				tb_write_out == 1'b0 && 
-				tb_write_error == 1'b0 &&
+				tb_write_error == 1'b1 &&
 				tb_write_ready == 1'b1) 
 		begin
       $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
