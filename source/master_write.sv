@@ -27,6 +27,7 @@ stateType next_state;
 reg [31:0] dest;
 reg [31:0] next_dest;
 reg [31:0] next_HWDATA;
+reg [31:0] next_HADDR;
 reg [127:0] encr_text_1;
 reg [127:0] next_encr_text_1;
 reg [127:0] encr_text_2;
@@ -39,12 +40,13 @@ reg [127:0] next_encr_text_4;
 
 always @ (posedge HCLK, negedge HRESETn) begin
   if (HRESETn == 1'b0) begin
-    dest <= dest_updated ? destination : next_dest;
+  	dest <= next_dest;
     encr_text_1 <= next_encr_text_1;
     encr_text_2 <= next_encr_text_2;
     encr_text_3 <= next_encr_text_3;
     encr_text_4 <= next_encr_text_4;
     HWDATA <= next_HWDATA;
+    HADDR <= next_dest;
     state <= next_state;
   end else begin
     dest <= 32'b0;
@@ -53,6 +55,7 @@ always @ (posedge HCLK, negedge HRESETn) begin
     encr_text_3 <= 128'b0;
     encr_text_4 <= 128'b0;
     HWDATA <= 32'b0;
+    HADDR <= 32'b0;
     state <= IDLE;
   end
 end
@@ -60,14 +63,24 @@ end
 always_comb begin
 
   // Defaults
-  HADDR = 32'b0;   // Default address is in 'dest'
   HWRITE = 1'b1;   // Write
   HSIZE = 3'b010;  // Word
   HBURST = 3'b111; // 16-beat incr burst
   HTRANS = 2'b0;   // IDLE
-  HWDATA = 32'b0;  // Write data is empty
+
+	next_encr_text_1	=	encr_text_1;
+	next_encr_text_2	= encr_text_2;
+	next_encr_text_3	= encr_text_3;
+	next_encr_text_4	= encr_text_4;
+	next_HWDATA				= 32'b0;
+	next_state 				=	IDLE;
+	next_dest					= dest;
 
   // HREADY, HRESP
+  
+  if (dest_updated) begin
+  	next_dest = destination;
+  end
 
   case (state)
     IDLE:
@@ -300,6 +313,7 @@ always_comb begin
           next_dest = destination;
         end else begin
           next_state = IDLE;
+          next_dest = dest;
         end
         HTRANS = 2'b11;
         next_HWDATA = encr_text_4[127:96];
@@ -314,3 +328,5 @@ always_comb begin
     end
   endcase
 end
+
+endmodule
