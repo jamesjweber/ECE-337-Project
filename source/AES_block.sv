@@ -1,6 +1,6 @@
 module AES_block
 (
-	input wire HCLK,
+	input wire clk,
 	input wire HRESETn,
 	input wire slave_HSELx,
 	input wire [31:0] slave_HADDR,
@@ -11,7 +11,6 @@ module AES_block
 	input wire slave_HREADY,
 	input wire [31:0] slave_HWDATA,
 	input wire master_HCLK,
-	input wire master_HRESETn,
   	input wire master_HREADY,
   	input wire master_HRESP,
   	input wire [31:0] master_HRDATA,
@@ -26,6 +25,19 @@ module AES_block
 	output reg [31:0] master_HWDATA
 );
 
+wire go;
+wire [127:0] key;
+wire [127:0] nonce;
+wire [127:0] pText;
+wire [127:0] encr_text;
+wire [127:0] plain_text;
+wire [31:0] destination;
+wire done;
+wire write_out;
+wire fifo_full;
+
+
+
 controlled_encryption_block ceb(
 	.clk(clk),
 	.go(go), //Signal to tell encryptor that the nonce and key are valid. Requires data either already in the FIFO or prior to encryption end, ~40 clocks.
@@ -38,7 +50,7 @@ controlled_encryption_block ceb(
 
 fifo_buffer fb(
 	.clk(clk),
-	.nRst(nRst),
+	.nRst(HRESETn),
 	.read(done),
 	.write(write_out),
 	.dataIn(plain_text),
@@ -47,7 +59,7 @@ fifo_buffer fb(
 );
 
 ahb_lite_master_interface mi(
-	.HCLK(HCLK),
+	.HCLK(clk),
 	.HRESETn(HRESETn),
 	.HREADY(master_HREADY),
 	.HRESP(master_HRESP),
@@ -55,7 +67,7 @@ ahb_lite_master_interface mi(
 	.destination(destination), // Comes from ahb-slave
 	.dest_updated(write_out), // Pulse that is sent to notify master of updated dest ^
 	.encr_text(encr_text),	// John sends me the encr text
-	.text_rcvd(text_rcvd),  // This is the pulse signal you send before sending the encr text
+	.text_rcvd(done),  // This is the pulse signal you send before sending the encr text
 	.HADDR(master_HADDR),
 	.HWRITE(master_HWRITE),
 	.HSIZE(master_HSIZE),
@@ -65,7 +77,7 @@ ahb_lite_master_interface mi(
 );
 
 ahb_lite_slave_interface si(
-	.HCLK(HCK),
+	.HCLK(clk),
 	.HRESETn(HRESETn),
 	.HSELx(slave_HSELx),
 	.HADDR(slave_HADDR),
@@ -82,7 +94,31 @@ ahb_lite_slave_interface si(
 	.nonce(nonce),
 	.destination(destination),
 	.plain_text(plain_text),
-	.write_out(write_out)
+	.write_out(go)
 );
-	
+
 endmodule
+
+/*
+module ahb_lite_slave_interface (
+	input wire HCLK,
+	input wire HRESETn,
+	input wire HSELx,
+	input wire [31:0] HADDR,
+	input wire HWRITE,
+	input wire [2:0] HSIZE,
+	input wire [2:0] HBURST,
+	input wire [1:0] HTRANS,
+	input wire HREADY,
+	input wire [31:0] HWDATA,
+	input wire fifo_full,
+	output reg HREADYOUT,
+	output reg HRESP,
+	output reg [31:0] HRDATA,
+	output reg [127:0] key,
+	output reg [127:0] nonce,
+	output reg [31:0] destination,
+	output reg [127:0] plain_text,
+	output reg write_out
+);
+ */
