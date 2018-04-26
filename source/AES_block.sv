@@ -108,3 +108,4 @@ module ahb_lite_slave_interface (
 	output reg write_out
 );
  */
+endmodule
