@@ -27,17 +27,20 @@ reg [127:0] prev_key;
 reg [127:0] prev_nonce;
 reg [31:0] 	prev_dest;
 reg [127:0] prev_text;
+reg valid;
 
+// always_ff @ (negedge HRESETn
+assign valid = ~HRESETn && HSELx;
 
-always_ff @ (posedge HCLK, posedge HSELx, negedge HRESETn) begin
-  if (HRESETn == 1'b0 && HSELx == 1'b1) begin // If selected and not being reset
+always_ff @ (posedge HCLK or posedge valid) begin
+  if (valid) begin // If selected and not being reset
     prev_HADDR <= HADDR;
     prev_key   <= key;
     prev_nonce <= nonce;
     prev_dest  <= destination;
     prev_text  <= plain_text;
   end else begin // Else if being reset and/or not currently selected
-    state <= S1;
+    //state <= S1;
     // write_ready = 1'b1; // AHB Protocol: During reset all slaves must ensure that HREADYOUT is HIGH.
     prev_HADDR <= 32'b0;
     prev_key 	 <= 128'b0;
@@ -47,7 +50,7 @@ always_ff @ (posedge HCLK, posedge HSELx, negedge HRESETn) begin
   end
 end
 
-always_ff @ (posedge HCLK, HBURST, HTRANS) begin
+always_ff @ (HCLK, HBURST, HTRANS) begin
 	convert({HBURST, HTRANS}, state); // Set next state
 end
 
@@ -424,41 +427,42 @@ end
 
 task convert;
 input reg [4:0] numeric_state;
-output stateType state;
+output stateType nstate;
 begin
 	case (numeric_state)
-    5'b00000: state = S1;
-    5'b00001: state = S2;
-    5'b00010: state = S3;
-    5'b00011: state = S4;
-    5'b00100: state = S5;
-    5'b00101: state = S6;
-    5'b00110: state = S7;
-    5'b00111: state = S8;
-    5'b01000: state = S9;
-    5'b01001: state = S10;
-    5'b01010: state = S11;
-    5'b01011: state = S12;
-    5'b01100: state = S13;
-    5'b01101: state = S14;
-    5'b01110: state = S15;
-    5'b01111: state = S16;
-    5'b10000: state = S17;
-    5'b10001: state = S18;
-    5'b10010: state = S19;
-    5'b10011: state = S20;
-    5'b10100: state = S21;
-    5'b10101: state = S22;
-    5'b10110: state = S23;
-    5'b10111: state = S24;
-    5'b11000: state = S25;
-    5'b11001: state = S26;
-    5'b11010: state = S27;
-    5'b11011: state = S28;
-    5'b11100: state = S29;
-    5'b11101: state = S30;
-    5'b11110: state = S31;
-    5'b11111: state = S32;
+    5'b00000: nstate = S1;
+    5'b00001: nstate = S2;
+    5'b00010: nstate = S3;
+    5'b00011: nstate = S4;
+    5'b00100: nstate = S5;
+    5'b00101: nstate = S6;
+    5'b00110: nstate = S7;
+    5'b00111: nstate = S8;
+    5'b01000: nstate = S9;
+    5'b01001: nstate = S10;
+    5'b01010: nstate = S11;
+    5'b01011: nstate = S12;
+    5'b01100: nstate = S13;
+    5'b01101: nstate = S14;
+    5'b01110: nstate = S15;
+    5'b01111: nstate = S16;
+    5'b10000: nstate = S17;
+    5'b10001: nstate = S18;
+    5'b10010: nstate = S19;
+    5'b10011: nstate = S20;
+    5'b10100: nstate = S21;
+    5'b10101: nstate = S22;
+    5'b10110: nstate = S23;
+    5'b10111: nstate = S24;
+    5'b11000: nstate = S25;
+    5'b11001: nstate = S26;
+    5'b11010: nstate = S27;
+    5'b11011: nstate = S28;
+    5'b11100: nstate = S29;
+    5'b11101: nstate = S30;
+    5'b11110: nstate = S31;
+    5'b11111: nstate = S32;
+    default: nstate = S1;
 	endcase
 end
 endtask
