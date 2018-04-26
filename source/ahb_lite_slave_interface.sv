@@ -35,35 +35,37 @@ assign error = size_control_error || read_error || write_error; // and future er
 assign ready = read_ready && write_ready; // and future response signals
 
 // Internal Blocks
-transfer_response TR(.HCLK(HCLK), 
-										 .HRESETn(HRESETn), 
-										 .enable(HSELx), 
-										 .ready(ready), 
-										 .error(error), 
-										 .HREADY(HREADY), 
+transfer_response TR(.HCLK(HCLK),
+										 .HRESETn(HRESETn),
+										 .enable(HSELx),
+										 .ready(ready),
+										 .error(error),
+										 .HREADY(HREADY),
 										 .HRESP(HRESP)
 										 );
-size_control SC(.HSELx(HSELx), 
-								.HWDATA(HWDATA), 
-								.HSIZE(HSIZE), 
-								.SWDATA(SWDATA), 
+
+size_control SC(.HSELx(HSELx),
+								.HWDATA(HWDATA),
+								.HSIZE(HSIZE),
+								.SWDATA(SWDATA),
 								.ERROR(size_control_error)
 								);
-slave_write SW(.HCLK(HCLK), 
-							 .HRESETn(HRESETn), 
-							 .HSELx(HSELx), 
-							 .HADDR(HADDR), 
-							 .HBURST(HBURST), 
-							 .HTRANS(HTRANS), 
-							 .HREADY(HREADY), 
-							 .fifo_full(fifo_full), 
-							 .SWDATA(SWDATA), 
-							 .key(key), 
-							 .nonce(nonce), 
-							 .destination(destination), 
-							 .plain_text(plain_text), 
-							 .write_error(write_error), 
-							 .write_ready(write_ready), 
+								
+slave_write SW(.HCLK(HCLK),
+							 .HRESETn(HRESETn),
+							 .HSELx(HSELx),
+							 .HADDR(HADDR),
+							 .HBURST(HBURST),
+							 .HTRANS(HTRANS),
+							 .HREADY(HREADY),
+							 .fifo_full(fifo_full),
+							 .SWDATA(SWDATA),
+							 .key(key),
+							 .nonce(nonce),
+							 .destination(destination),
+							 .plain_text(plain_text),
+							 .write_error(write_error),
+							 .write_ready(write_ready),
 							 .write_out(write_out)
 							 );
 
