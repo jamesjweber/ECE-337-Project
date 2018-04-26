@@ -49,11 +49,11 @@ module tb_controlled_encryption_block();
 	initial
 	begin
 		tb_go = 1'b0;
-		@(posedge tb_clk);
-		@(posedge tb_clk);
-		@(posedge tb_clk);
 		tb_keyIn = 127'b0;
 		tb_nonceIn = 127'b0;
+		@(posedge tb_clk);
+		@(posedge tb_clk);
+		@(posedge tb_clk);
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		@(posedge tb_clk);

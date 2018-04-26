@@ -36,7 +36,7 @@ reg [127:0] next_encr_text_3;
 reg [127:0] encr_text_4;
 reg [127:0] next_encr_text_4;
 
-always_ff @ (posedge HCLK, negedge HRESETn, posedge HREADY, posedge HRESP, posedge dest_updated) begin
+always_ff @ (posedge HCLK or negedge HRESETn) begin
 
   if (HRESETn == 1'b0 && HREADY == 1'b1 && HRESP == 1'b0) begin // If selected & !reset & !error
     if (dest_updated == 1'b1) begin
