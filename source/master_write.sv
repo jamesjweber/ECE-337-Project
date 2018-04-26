@@ -36,9 +36,8 @@ reg [127:0] next_encr_text_3;
 reg [127:0] encr_text_4;
 reg [127:0] next_encr_text_4;
 
-always_ff @ (posedge HCLK or negedge HRESETn or posedge HREADY or posedge HRESP or posedge dest_updated) begin
-
-  if (HRESETn == 1'b0 && HREADY == 1'b1 && HRESP == 1'b0) begin // If selected & !reset & !error
+always @ (posedge HCLK, negedge HRESETn) begin
+  if (HRESETn == 1'b0) begin
     dest <= dest_updated ? destination : next_dest;
     encr_text_1 <= next_encr_text_1;
     encr_text_2 <= next_encr_text_2;
@@ -59,52 +58,57 @@ end
 
 always_comb begin
 
-  next_dest = dest;
-  next_encr_text_1 = encr_text_1;
-  next_encr_text_2 = encr_text_2;
-  next_encr_text_3 = encr_text_3;
-  next_encr_text_4 = encr_text_4;
-  next_HWDATA = 32'b0;
-  next_state = state;
-
   // Defaults
-  HSIZE = 3'b010;   // Word
+  HADDR = 32'b0;   // Default address is in 'dest'
   HWRITE = 1'b1;   // Write
+  HSIZE = 3'b010;  // Word
   HBURST = 3'b111; // 16-beat incr burst
-  HTRANS = 2'b00;  // IDLE
-  HADDR = dest;    // Default address is in 'dest'
+  HTRANS = 2'b0;   // IDLE
+  HWDATA = 32'b0;  // Write data is empty
+
+  // HREADY, HRESP
 
   case (state)
     IDLE:
     begin
-      if (text_rcvd == 1'b1) begin
-        next_state = LOAD1;
+      if (HREADY == 1'b1 && HRESP == 1'b0) begin
+        if (text_rcvd == 1'b1) begin
+          next_state = LOAD1;
+        end
+        HWRITE = 1'b0;
       end
-      HWRITE = 1'b0;
     end
 
     LOAD1:
     begin
-      next_encr_text_1 = encr_text;
-      next_state = LOAD2;
+      if (HREADY == 1'b1 && HRESP == 1'b0) begin
+        next_encr_text_1 = encr_text;
+        next_state = LOAD2;
+      end
     end
 
     LOAD2:
     begin
-      next_encr_text_2 = encr_text;
-      next_state = LOAD3;
+      if (HREADY == 1'b1 && HRESP == 1'b0) begin
+        next_encr_text_2 = encr_text;
+        next_state = LOAD3;
+      end
     end
 
     LOAD3:
     begin
-      next_encr_text_3 = encr_text;
-      next_state = LOAD4;
+      if (HREADY == 1'b1 && HRESP == 1'b0) begin
+        next_encr_text_3 = encr_text;
+        next_state = LOAD4;
+      end
     end
 
     LOAD4:
     begin
-      next_encr_text_4 = encr_text;
-      next_state = NONSEQ;
+      if (HREADY == 1'b1 && HRESP == 1'b0) begin
+        next_encr_text_4 = encr_text;
+        next_state = NONSEQ;
+      end
     end
 
     NONSEQ:
@@ -308,7 +312,4 @@ always_comb begin
       next_state = IDLE;
     end
   endcase
-
 end
-
-endmodule // master_write
