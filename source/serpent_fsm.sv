@@ -40,6 +40,13 @@ end
 
 always_comb
 begin
+	nextState = IDLE;
+	keyLock = 0;
+	rst = 0;
+	fsmGo = 0;
+	nround = round;
+	nsBoxSelect = sBoxSelect;
+	nkeyBoxSelect = keyBoxSelect;
 	newTick = tick + 1;
 	case(state)
 	IDLE:begin
