@@ -36,9 +36,13 @@ reg [127:0] next_encr_text_3;
 reg [127:0] encr_text_4;
 reg [127:0] next_encr_text_4;
 
-always_ff @ (posedge HCLK or negedge HRESETn or posedge HREADY or posedge HRESP or posedge dest_updated) begin
+reg temp;
 
-  if (HRESETn == 1'b0 && HREADY == 1'b1 && HRESP == 1'b0) begin // If selected & !reset & !error
+assign temp = ~HRESETn && HREADY && ~HRESP;
+
+always @ (posedge HCLK) begin
+
+  if (temp) begin // If selected & !reset & !error
     dest <= dest_updated ? destination : next_dest;
     encr_text_1 <= next_encr_text_1;
     encr_text_2 <= next_encr_text_2;
