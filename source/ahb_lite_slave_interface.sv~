@@ -40,7 +40,7 @@ transfer_response TR(.HCLK(HCLK),
 										 .enable(HSELx), 
 										 .ready(ready), 
 										 .error(error), 
-										 .HREADYOUT(HREADYOUT), 
+										 .HREADY(HREADY), 
 										 .HRESP(HRESP)
 										 );
 size_control SC(.HSELx(HSELx), 

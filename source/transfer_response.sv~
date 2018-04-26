@@ -4,7 +4,7 @@ module transfer_response (
   input wire enable,
   input wire ready,
   input wire error,
-  output reg HREADYOUT,
+  output reg HREADY,
   output reg HRESP
 );
 
