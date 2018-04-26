@@ -12,9 +12,9 @@ module AES_block
 	input wire [31:0] slave_HWDATA,
 	input wire master_HCLK,
 	input wire master_HRESETn,
-  input wire master_HREADY,
-  input wire master_HRESP,
-  input wire [31:0] master_HRDATA,
+  	input wire master_HREADY,
+  	input wire master_HRESP,
+  	input wire [31:0] master_HRDATA,
 	output reg slave_HREADYOUT,
 	output reg slave_HRESP,
 	output reg [31:0] slave_HRDATA,
@@ -43,7 +43,6 @@ fifo_buffer fb(
 	.write(write_out),
 	.dataIn(plain_text),
 	.dataOut(pText),
-	.empty(), // I don't use this
 	.full(fifo_full)
 );
 
