@@ -4,7 +4,7 @@ module transfer_response (
   input wire enable,
   input wire ready,
   input wire error,
-  output reg HREADY,
+  output reg HREADYOUT,
   output reg HRESP
 );
 
@@ -16,12 +16,12 @@ wire valid;
 
 assign valid = enable && ~HRESETn;
 
-always_ff @ (posedge HCLK, posedge valid) begin 
+always_ff @ (posedge HCLK, posedge valid) begin
   if (valid == 1'b1) begin
      state <= next_state;
      $display("clk");
   end else begin
-    state <= TL; // If disabled, state is transfer low (HREADY and HRESP = 0)
+    state <= TL; // If disabled, state is transfer low (HREADYOUT and HRESP = 0)
   	$display("clk");
   end
 end
@@ -37,7 +37,7 @@ always_comb begin
       // Set State
       next_state = error ? ERR1 : ready ? TH : TL;
       // Set Output
-      HREADY = 1'b0;
+      HREADYOUT = 1'b0;
       HRESP = 1'b0;
     end
 
@@ -46,7 +46,7 @@ always_comb begin
       // Set State
       next_state = error ? ERR1 : ready ? TH : TL;
       // Set Output
-      HREADY = 1'b1;
+      HREADYOUT = 1'b1;
       HRESP = 1'b0;
     end
 
@@ -55,7 +55,7 @@ always_comb begin
       // Set State
       next_state = ERR2;
       // Set Output
-      HREADY = 1'b0;
+      HREADYOUT = 1'b0;
       HRESP = 1'b1;
     end
 
@@ -64,7 +64,7 @@ always_comb begin
       // Set State
       next_state = ready ? TH : TL;
       // Set Output
-      HREADY = 1'b1;
+      HREADYOUT = 1'b1;
       HRESP = 1'b1;
     end
 
