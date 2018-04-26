@@ -12,9 +12,8 @@ module controlled_encryption_block
 wire rst;
 wire keyLock;
 wire fsmGo;
-wire [2:0] keySelect;
-wire [2:0] encSelect;
-wire [4:0] count;
+logic [2:0] keySelect;
+logic [2:0] encSelect;
 wire [4:0] round;
 
 serpent_fsm fsm(
@@ -24,7 +23,6 @@ serpent_fsm fsm(
 	.keyBoxSelect(keySelect),
 	.round(round),
 	.fsmGo(fsmGo),
-	.done(done),
 	.rst(rst),
 	.keyLock(keyLock)
 );
@@ -35,7 +33,7 @@ encryption_block eb(
 	.keyLock(keyLock),
 	.fsmGo(fsmGo),
 	.done(done),
-	.count(count),
+	.count(round),
 	.keySelect(keySelect),
 	.encSelect(encSelect),
 	.keyIn(keyIn),
