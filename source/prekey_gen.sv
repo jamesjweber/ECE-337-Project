@@ -15,12 +15,7 @@ module prekey_gen
 
 	assign ct = {24'b0, count};
 	assign hold = preKeyIn[31:0] ^ preKeyIn[63:32] ^ preKeyIn[95:64] ^ preKeyIn[127:96] ^ 32'h9e3779b9 ^ ct;
-	assign mid1 = hold << 11;
-	assign mid2 = hold >> 21;
-	assign prKey = mid1 | mid2;
-
-assign hold = preKeyIn[31:0] ^ preKeyIn[63:32] ^ preKeyIn[95:64] ^ preKeyIn[127:96] ^ 32'h9e3779b9 ^ ct;
-assign ct = {24'b0, count};
-assign prKey = (hold << 11) | (hold >> 21);
+	assign ct = {24'b0, count};
+	assign prKey = (hold << 11) | (hold >> 21);
   
 endmodule
