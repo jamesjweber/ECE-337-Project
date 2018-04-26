@@ -5,11 +5,7 @@
 module tb_ahb_lite_master_interface();
 
   // Define parameters
-<<<<<<< HEAD
-  // basic test bench parameters
-=======
->>>>>>> 95c8b32944c1f3f3e04bce56f40e16c6ae1674be
-  localparam	CLK_PERIOD		= 5.0;
+  localparam	CLK_PERIOD		= 2.5;
   localparam 	AHB_BUS_SIZE 	= 32;
 
   // Shared Test Variables
@@ -37,9 +33,9 @@ module tb_ahb_lite_master_interface();
   always
   begin
     tb_HCLK = 1'b0;
-    #(CLK_PERIOD/3.0);
+    #(CLK_PERIOD/2.0);
     tb_HCLK = 1'b1;
-    #(CLK_PERIOD/3.0);
+    #(CLK_PERIOD/2.0);
   end
 
   ahb_lite_master_interface DUT(
@@ -63,10 +59,6 @@ module tb_ahb_lite_master_interface();
 	// Test bench process
   initial
   begin
-<<<<<<< HEAD
-  $display("me and my grandma take meds, ooh");
-=======
->>>>>>> 95c8b32944c1f3f3e04bce56f40e16c6ae1674be
     // Initialize all of the test inputs
     tb_HRESETn      = 1'b1;		// Initialize to be inactive
     tb_HREADY		    = 1'b1; 	// Initialize to be high (ready)
@@ -79,6 +71,7 @@ module tb_ahb_lite_master_interface();
 
     tb_test_num = 0;
     tb_test_case = "Test bench initializaton";
+    @(posedge tb_HCLK)
     @(posedge tb_HCLK)
 
     // Test Case 1 - Initial Reset
@@ -104,6 +97,8 @@ module tb_ahb_lite_master_interface();
 	@(posedge tb_HCLK)
 
   tb_dest_updated = 1'b0;
+  
+  @(posedge tb_HCLK)
 
   if (tb_HADDR == 8'h4) begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
@@ -153,7 +148,7 @@ module tb_ahb_lite_master_interface();
   
   @(posedge tb_HCLK)
   
-  if (tb_HADDR == 8'h00000040) begin
+  if (tb_HADDR == 8'h40) begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
     $display("%s: Case %1d, FAILED!", tb_test_case, tb_test_num);

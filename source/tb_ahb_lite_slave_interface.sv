@@ -20,14 +20,14 @@ reg [1:0] tb_HTRANS;
 reg tb_HREADY;
 reg [AHB_BUS_SIZE - 1:0] tb_HWDATA;
 reg tb_fifo_full;
-reg tb_HREADYOUT;
+ref tb_HREADYOUT;
 reg tb_HRESP;
-reg [AHB_BUS_SIZE - 1:0] tb_HRDATA;
-reg [127:0] tb_key;
-reg [127:0] tb_nonce;
-reg [31:0] tb_destination;
-reg [127:0] tb_plain_text;
-reg [127:0] tb_write_out;
+reg tb_HRDATA;
+reg tb_key;
+reg tb_nonce;
+reg tb_destination;
+reg tb_plain_text;
+reg tb_write_out;
 
 // Test bench signals
 int tb_test_num;
@@ -75,7 +75,7 @@ begin
   tb_HTRANS			= 2'b0;		// Initially IDLE
   tb_HREADY			= 1'b1;		// Initially Ready
   tb_fifo_full	= 1'b0;		// FIFO not full
-  tb_HWDATA			=	32'b0;	// Empty data initially
+  tb_SWDATA			=	32'b0;	// Empty data initially
 
   tb_test_num = 0;
   tb_test_case = "Test bench initializaton";
@@ -95,7 +95,10 @@ begin
   if (tb_key == 128'b0 &&
       tb_nonce == 128'b0 &&
       tb_destination == 32'b0 &&
-      tb_plain_text == 128'b0)
+      tb_plain_text == 128'b0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -116,7 +119,10 @@ begin
   if (tb_key == 128'b0 &&
       tb_nonce == 128'b0 &&
       tb_destination == 32'b0 &&
-      tb_plain_text == 128'b0)
+      tb_plain_text == 128'b0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b1 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -125,6 +131,9 @@ begin
     $display("\ttb_nonce: %h",tb_nonce);
     $display("\ttb_destination: %h",tb_destination);
     $display("\ttb_plain_text: %h",tb_plain_text);
+    $display("\ttb_write_out: %h",tb_write_out);
+    $display("\ttb_write_error: %h",tb_write_error);
+    $display("\ttb_write_ready: %h",tb_write_ready);
   end
 
   // Test Case 3 - S3, Key 1/4
@@ -132,21 +141,25 @@ begin
   tb_test_case = 	"S3, Key 1/4";
 
 
+
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h11111111;
+  tb_SWDATA = 32'h11111111;
   // For next test case
   tb_HADDR = 32'h08;
 
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h22222222;
+  tb_SWDATA = 32'h22222222;
   // For next (next) test case
   tb_HADDR = 32'h0C;
 
   if (tb_key == 128'h11111111 &&
       tb_nonce == 128'b0 &&
       tb_destination == 32'b0 &&
-      tb_plain_text == 128'b0)
+      tb_plain_text == 128'b0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -158,14 +171,17 @@ begin
   tb_test_case =	"S3, Key 2/4";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h33333333;
+  tb_SWDATA = 32'h33333333;
   // For next (next) test case
   tb_HADDR = 32'h10;
 
   if (tb_key == 128'h2222222211111111 &&
       tb_nonce == 128'b0 &&
       tb_destination == 32'b0 &&
-      tb_plain_text == 128'b0)
+      tb_plain_text == 128'b0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -178,14 +194,17 @@ begin
   tb_test_case =	"S3, Key 3/4";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h44444444;
+  tb_SWDATA = 32'h44444444;
   // For next (next) test case
   tb_HADDR = 32'h14;
 
   if (tb_key == 128'h333333332222222211111111 &&
       tb_nonce == 128'b0 &&
       tb_destination == 32'b0 &&
-      tb_plain_text == 128'b0)
+      tb_plain_text == 128'b0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -197,14 +216,17 @@ begin
   tb_test_case =	"S3, Key 4/4";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h12345678;
+  tb_SWDATA = 32'h12345678;
   // For next (next) test case
   tb_HADDR = 32'h18;
 
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'b0 &&
       tb_destination == 32'b0 &&
-      tb_plain_text == 128'b0)
+      tb_plain_text == 128'b0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -217,14 +239,17 @@ begin
   tb_test_case =	"S3, Nonce 1/4";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h23456789;
+  tb_SWDATA = 32'h23456789;
   // For next (next) test case
   tb_HADDR = 32'h1C;
 
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'h12345678 &&
       tb_destination == 32'h0 &&
-      tb_plain_text == 128'h0)
+      tb_plain_text == 128'h0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -237,14 +262,17 @@ begin
   tb_test_case =	"S3, Nonce 2/4";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h34567890;
+  tb_SWDATA = 32'h34567890;
   // For next (next) test case
   tb_HADDR = 32'h20;
 
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'h2345678912345678 &&
       tb_destination == 32'h0 &&
-      tb_plain_text == 128'h0)
+      tb_plain_text == 128'h0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -257,14 +285,17 @@ begin
   tb_test_case =	"S3, Nonce 3/4";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h45678900;
+  tb_SWDATA = 32'h45678900;
   // For next (next) test case
   tb_HADDR = 32'h24;
 
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'h345678902345678912345678 &&
       tb_destination == 32'h0 &&
-      tb_plain_text == 128'h0)
+      tb_plain_text == 128'h0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -277,14 +308,17 @@ begin
   tb_test_case =	"S3, Nonce 4/4";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h10101010;
+  tb_SWDATA = 32'h10101010;
   // For next (next) test case
   tb_HADDR = 32'h34;
 
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'h45678900345678902345678912345678 &&
       tb_destination == 32'h0 &&
-      tb_plain_text == 128'h0)
+      tb_plain_text == 128'h0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -296,14 +330,17 @@ begin
   tb_test_case =	"S3, Dest. Addr.";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h1;
+  tb_SWDATA = 32'h1;
   // For next (next) test case
   tb_HADDR = 32'h38;
 
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'h45678900345678902345678912345678 &&
       tb_destination == 32'h10101010 &&
-      tb_plain_text == 128'h0)
+      tb_plain_text == 128'h0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -315,14 +352,17 @@ begin
   tb_test_case =	"Plain Text (1/4)";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h2;
+  tb_SWDATA = 32'h2;
   // For next (next) test case
   tb_HADDR = 32'h3C;
 
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'h45678900345678902345678912345678 &&
       tb_destination == 32'h10101010 &&
-      tb_plain_text == 128'h1)
+      tb_plain_text == 128'h1 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -334,14 +374,17 @@ begin
   tb_test_case =	"Plain Text (2/4)";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h3;
+  tb_SWDATA = 32'h3;
   // For next (next) test case
   tb_HADDR = 32'h40;
 
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'h45678900345678902345678912345678 &&
       tb_destination == 32'h10101010 &&
-      tb_plain_text == 128'h200000001)
+      tb_plain_text == 128'h200000001 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -353,12 +396,15 @@ begin
   tb_test_case =	"Plain Text (3/4)";
 
   @(posedge tb_HCLK)
-  tb_HWDATA = 32'h4;
+  tb_SWDATA = 32'h4;
 
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'h45678900345678902345678912345678 &&
       tb_destination == 32'h10101010 &&
-      tb_plain_text == 128'h30000000200000001)
+      tb_plain_text == 128'h30000000200000001 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -374,7 +420,10 @@ begin
   if (tb_key == 128'h44444444333333332222222211111111 &&
       tb_nonce == 128'h45678900345678902345678912345678 &&
       tb_destination == 32'h10101010 &&
-      tb_plain_text == 128'h4000000030000000200000001)
+      tb_plain_text == 128'h4000000030000000200000001 &&
+      tb_write_out == 1'b1 &&
+      tb_write_error == 1'b0 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
@@ -393,7 +442,10 @@ begin
   if (tb_key == 128'h0 &&
       tb_nonce == 128'h0 &&
       tb_destination == 32'h0 &&
-      tb_plain_text == 128'h0)
+      tb_plain_text == 128'h0 &&
+      tb_write_out == 1'b0 &&
+      tb_write_error == 1'b1 &&
+      tb_write_ready == 1'b1)
   begin
     $display("%s: Case %1d, PASSED!", tb_test_case, tb_test_num);
   end else begin
