@@ -1,7 +1,7 @@
 module AES_block
 (
-	inout wire HCLK,
-	inout wire HRESETn,
+	input wire HCLK,
+	input wire HRESETn,
 	input wire slave_HSELx,
 	input wire [31:0] slave_HADDR,
 	input wire slave_HWRITE,

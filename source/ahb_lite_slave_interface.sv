@@ -40,7 +40,7 @@ transfer_response TR(.HCLK(HCLK),
 										 .enable(HSELx),
 										 .ready(ready),
 										 .error(error),
-										 .HREADY(HREADY),
+										 .HREADYOUT(HREADYOUT),
 										 .HRESP(HRESP)
 										 );
 
