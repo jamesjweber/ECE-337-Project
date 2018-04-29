@@ -40,7 +40,7 @@ key_block kb(
 	.froundKey(frKey)
 );
 
-s_box sb(
+enc_sub sb(
 	.sel(encSelect),
 	.inData(nkeyMixOut),
 	.outData(sBoxOut)
