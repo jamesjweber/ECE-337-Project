@@ -19,7 +19,7 @@ module fifo_buffer
 	// Control state using flip-flop logic.
 	always_ff @(posedge clk, negedge nRst)
 	begin : FF_LOGIC
-		if(nRst == 1'b1)
+		if(nRst == 1'b0)
 		begin
 			// Reset pointers and flags.
 			curr_read <= 3'b000;
@@ -44,10 +44,8 @@ module fifo_buffer
 
 	always_comb
 	begin
-		// Initialize new pointers.
 		next_read = curr_read;
 		next_write = curr_write;
-
 		next_empty = curr_empty;
 		next_full = curr_full;
 

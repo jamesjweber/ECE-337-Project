@@ -1,6 +1,6 @@
 module AES_block
 (
-	input wire HCLK,
+	input wire clk,
 	input wire HRESETn,
 	input wire slave_HSELx,
 	input wire [31:0] slave_HADDR,
@@ -10,6 +10,8 @@ module AES_block
 	input wire [1:0] slave_HTRANS,
 	input wire slave_HREADY,
 	input wire [31:0] slave_HWDATA,
+	input wire master_HCLK,
+  	input wire master_HREADY,
   	input wire master_HRESP,
   	input wire [31:0] master_HRDATA,
 	output reg slave_HREADYOUT,
@@ -37,8 +39,8 @@ wire fifo_full;
 
 
 controlled_encryption_block ceb(
-	.clk(HCLK),
-	.go(go), //Signal to tell encryptor that the nonce and key are valid. Requires data either already in the FIFO or prior to encryption end, ~40 clocks.
+	.clk(clk),
+	.go(write_out), //Signal to tell encryptor that the nonce and key are valid. Requires data either already in the FIFO or prior to encryption end, ~40 clocks.
 	.keyIn(key),
 	.nonceIn(nonce),
 	.pText(pText),
@@ -47,7 +49,7 @@ controlled_encryption_block ceb(
 );
 
 fifo_buffer fb(
-	.clk(HCLK),
+	.clk(clk),
 	.nRst(HRESETn),
 	.read(done),
 	.write(write_out),
@@ -57,7 +59,7 @@ fifo_buffer fb(
 );
 
 ahb_lite_master_interface mi(
-	.HCLK(HCLK),
+	.HCLK(clk),
 	.HRESETn(HRESETn),
 	.HREADY(master_HREADY),
 	.HRESP(master_HRESP),
@@ -75,7 +77,7 @@ ahb_lite_master_interface mi(
 );
 
 ahb_lite_slave_interface si(
-	.HCLK(HCLK),
+	.HCLK(clk),
 	.HRESETn(HRESETn),
 	.HSELx(slave_HSELx),
 	.HADDR(slave_HADDR),
@@ -92,7 +94,7 @@ ahb_lite_slave_interface si(
 	.nonce(nonce),
 	.destination(destination),
 	.plain_text(plain_text),
-	.write_out(go)
+	.write_out(write_out)
 );
 
 endmodule

@@ -56,11 +56,15 @@ module tb_fifo_buffer();
 		tb_write = 1'b1;
 		#(CLK_PERIOD);
 		tb_write = 1'b0;
+		#(CLK_PERIOD);
+		#(CLK_PERIOD);
 
 		// Read that value back.
 		tb_read = 1'b1;
 		#(CLK_PERIOD);
 		tb_read = 1'b0;
+		#(CLK_PERIOD);
+		#(CLK_PERIOD);
 
 		assert(tb_dataOut == 128'h00000000000000000000000000000000)
 		$info("Correct single block of data read.");
@@ -70,10 +74,16 @@ module tb_fifo_buffer();
 		tb_dataIn = 128'h11111111111111111111111111111111;
 		tb_write = 1'b1;
 		#(CLK_PERIOD);
+		tb_write = 1'b0;
+		#(CLK_PERIOD);
+		#(CLK_PERIOD);
 
 		tb_dataIn = 128'h22222222222222222222222222222222;
+		tb_write = 1'b1;
 		#(CLK_PERIOD);
 		tb_write = 1'b0;
+		#(CLK_PERIOD);
+		#(CLK_PERIOD);
 
 		// Read the first value.
 		tb_read = 1'b1;

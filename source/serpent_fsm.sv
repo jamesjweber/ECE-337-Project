@@ -7,7 +7,8 @@ module serpent_fsm
 	output logic [4:0] round,
 	output logic rst,
 	output logic keyLock,
-	output logic fsmGo
+	output logic fsmGo,
+	output logic done
 );
 
 typedef enum bit [3:0] {IDLE, START, R0, R1, R2, R3, R4, R5, R6, NR7, FR7, END} stateType;
@@ -41,6 +42,7 @@ end
 always_comb
 begin
 	nextState = IDLE;
+	done = 0;
 	keyLock = 0;
 	rst = 0;
 	fsmGo = 0;
@@ -83,10 +85,12 @@ begin
 		if(tick == 0)
 		begin
 			keyLock = 1;
+			nextState = R0;
 		end
 		else if(tick == 1)
 		begin
 			fsmGo = 1;
+			nextState = R0;
 		end
 		else	if(tick == 3)
 		begin
@@ -106,6 +110,7 @@ begin
 		if(tick == 0)
 		begin
 			keyLock = 1;
+			nextState = R0;
 		end
 		if(tick == 3)
 		begin
@@ -125,6 +130,7 @@ begin
 		if(tick == 0)
 		begin
 			keyLock = 1;
+			nextState = R2;
 		end
 		if(tick == 3)
 		begin
@@ -144,6 +150,7 @@ begin
 		if(tick == 0)
 		begin
 			keyLock = 1;
+			nextState = R3;
 		end
 		if(tick == 3)
 		begin
@@ -164,6 +171,7 @@ begin
 		if(tick == 0)
 		begin
 			keyLock = 1;
+			nextState = R4;
 		end
 		if(tick == 3)
 		begin
@@ -184,6 +192,7 @@ begin
 		if(tick == 0)
 		begin
 			keyLock = 1;
+			nextState = R5;
 		end
 		if(tick == 3)
 		begin
@@ -204,6 +213,7 @@ begin
 		if(tick == 0)
 		begin
 			keyLock = 1;
+			nextState = R6;
 		end
 		if(tick == 3 && round > 29)
 		begin
@@ -232,6 +242,7 @@ begin
 		if(tick == 0)
 		begin
 			keyLock = 1;
+			nextState = NR7;
 		end
 		if(tick == 3)
 		begin
@@ -252,6 +263,7 @@ begin
 		if(tick == 0)
 		begin
 			keyLock = 1;
+			nextState = FR7;
 		end
 		if(tick == 3)
 		begin
@@ -269,10 +281,12 @@ begin
 	end
 	END:begin
 		keyLock = 0;
+		done = 1;
 		if(tick == 3)
 		begin
 			nextState = IDLE;
 			newTick = 0;
+			done = 1; 
 		end
 		else
 		begin

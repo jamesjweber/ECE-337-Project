@@ -21,7 +21,7 @@ reg tb_slave_HREADY;
 reg [AHB_BUS_SIZE - 1:0] tb_slave_HWDATA;
 reg tb_slave_HREADYOUT;
 reg tb_slave_HRESP;
-reg [31:0] tb_slave_HRDATA;
+reg [AHB_BUS_SIZE - 1:0] tb_slave_HRDATA;
 
 reg tb_master_HSELx;
 reg [AHB_BUS_SIZE - 1:0] tb_master_HADDR;
@@ -33,7 +33,7 @@ reg tb_master_HREADY;
 reg [AHB_BUS_SIZE - 1:0] tb_master_HWDATA;
 reg tb_master_HREADYOUT;
 reg tb_master_HRESP;
-reg [31:0] tb_master_HRDATA;
+reg [AHB_BUS_SIZE - 1:0] tb_master_HRDATA;
 
 reg tb_key;
 reg tb_nonce;
@@ -55,7 +55,7 @@ begin
 end
 
 AES_block DUT(
-	.HCLK(tb_HCLK),
+	.clk(tb_HCLK),
 	.HRESETn(tb_HRESETn),
 	.slave_HSELx(tb_slave_HSELx),
   .slave_HADDR(tb_slave_HADDR),
@@ -81,7 +81,7 @@ AES_block DUT(
 initial
 begin
   // Initialize all of the test inputs
-  tb_HRESETn 		= 1'b1;		// Initially set high (reset)
+  tb_HRESETn 		= 1'b0;		// Initially set high (reset)
   tb_slave_HSELx = 1'b1; 	// Initially selected
   tb_slave_HADDR = 32'b0; 	// Inital address of 0x0'
   tb_slave_HBURST	= 3'b0;		// Single Burst
@@ -99,7 +99,7 @@ begin
   tb_test_num += 1;
   tb_test_case = 	"Initial Reset (S1)";
 
-  tb_HRESETn = 1'b0;
+  tb_HRESETn = 1'b1;
 
   @(posedge tb_HCLK)
 
@@ -229,23 +229,102 @@ begin
   tb_test_num += 1;
   tb_test_case =	"Plain Text (4/4)";
 
-	tb_slave_HSELx = 1'b1; 	// Initially selected
-  tb_slave_HADDR = 32'b0; 	// Inital address of 0x0'
-  tb_slave_HBURST	= 3'b0;		// Single Burst
-  tb_slave_HTRANS			= 2'b0;		// Initially IDLE
-  tb_slave_HREADY			= 1'b1;		// Initially Ready
   @(posedge tb_HCLK)
-
-  // Test Case 16 - Final Reset
-  tb_test_num += 1;
-  tb_test_case =	"Final Reset";
-
-  tb_HRESETn = 1'b1;
   
+  // Test Case 12 - S3, Plain Text (1/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (1/4)";
+
   @(posedge tb_HCLK)
-  tb_HRESETn = 1'b0;
+  tb_slave_HWDATA = 32'h2;
+  // For next (next) test case
+  tb_slave_HADDR = 32'h3C;
+
+  // Test Case 13 - S3, Plain Text (2/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (2/4)";
+
   @(posedge tb_HCLK)
-  $display("done");
+  tb_slave_HWDATA = 32'h3;
+  // For next (next) test case
+  tb_slave_HADDR = 32'h40;
+
+  // Test Case 14- S3, Plain Text (3/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (3/4)";
+
+  @(posedge tb_HCLK)
+  tb_slave_HWDATA = 32'h4;
+
+  // Test Case 15- S3, Plain Text (4/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (4/4)";
+
+  @(posedge tb_HCLK)
+  
+  // Test Case 12 - S3, Plain Text (1/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (1/4)";
+
+  @(posedge tb_HCLK)
+  tb_slave_HWDATA = 32'h2;
+  // For next (next) test case
+  tb_slave_HADDR = 32'h3C;
+
+  // Test Case 13 - S3, Plain Text (2/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (2/4)";
+
+  @(posedge tb_HCLK)
+  tb_slave_HWDATA = 32'h3;
+  // For next (next) test case
+  tb_slave_HADDR = 32'h40;
+
+  // Test Case 14- S3, Plain Text (3/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (3/4)";
+
+  @(posedge tb_HCLK)
+  tb_slave_HWDATA = 32'h4;
+
+  // Test Case 15- S3, Plain Text (4/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (4/4)";
+
+  @(posedge tb_HCLK)
+  
+  // Test Case 12 - S3, Plain Text (1/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (1/4)";
+
+  @(posedge tb_HCLK)
+  tb_slave_HWDATA = 32'h2;
+  // For next (next) test case
+  tb_slave_HADDR = 32'h3C;
+
+  // Test Case 13 - S3, Plain Text (2/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (2/4)";
+
+  @(posedge tb_HCLK)
+  tb_slave_HWDATA = 32'h3;
+  // For next (next) test case
+  tb_slave_HADDR = 32'h40;
+
+  // Test Case 14- S3, Plain Text (3/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (3/4)";
+
+  @(posedge tb_HCLK)
+  tb_slave_HWDATA = 32'h4;
+
+  // Test Case 15- S3, Plain Text (4/4)
+  tb_test_num += 1;
+  tb_test_case =	"Plain Text (4/4)";
+
+  @(posedge tb_HCLK)
+  
+  $display("fin");
   
 end
 
