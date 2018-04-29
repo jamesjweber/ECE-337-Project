@@ -18,7 +18,7 @@ wire [31:0] tC2;
 
 
 	assign tA1 = (A << 13) | (A >> 19); // 13-bit left rotation.
-	assign tC1 = (C << 3) | (A >> 29); // 3-bit left rotation.
+	assign tC1 = (C << 3) | (C >> 29); // 3-bit left rotation.
 	assign tB1 = B ^ tA1 ^ tC1; // XOR.
 	assign tD1 = D ^ tC1 ^ (tA1 << 3); // 3-bit left shift and XOR.
 	assign newB = (tB1 << 1) | (tB1 >> 31) ; // 1-bit rotation.
