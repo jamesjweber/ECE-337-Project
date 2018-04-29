@@ -39,7 +39,16 @@ reg [127:0] next_encr_text_4;
 
 
 always_ff @ (posedge HCLK, negedge HRESETn) begin
-  if (HRESETn == 1'b1) begin
+  if (HRESETn == 1'b0) begin
+  	dest <= 32'b0;
+    encr_text_1 <= 128'b0;
+    encr_text_2 <= 128'b0;
+    encr_text_3 <= 128'b0;
+    encr_text_4 <= 128'b0;
+    HWDATA <= 32'b0;
+    HADDR <= 32'b0;
+    state <= IDLE;
+  end else begin
   	dest <= next_dest;
     encr_text_1 <= next_encr_text_1;
     encr_text_2 <= next_encr_text_2;
@@ -48,15 +57,6 @@ always_ff @ (posedge HCLK, negedge HRESETn) begin
     HWDATA <= next_HWDATA;
     HADDR <= next_dest;
     state <= next_state;
-  end else begin
-    dest <= 32'b0;
-    encr_text_1 <= 128'b0;
-    encr_text_2 <= 128'b0;
-    encr_text_3 <= 128'b0;
-    encr_text_4 <= 128'b0;
-    HWDATA <= 32'b0;
-    HADDR <= 32'b0;
-    state <= IDLE;
   end
 end
 

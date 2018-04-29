@@ -5,7 +5,7 @@
 module tb_ahb_lite_master_interface();
 
   // Define parameters
-  localparam	CLK_PERIOD		= 10.0;
+  localparam	CLK_PERIOD		= 5.0;
   localparam 	AHB_BUS_SIZE 	= 32;
 
   // Shared Test Variables

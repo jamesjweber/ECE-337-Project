@@ -30,20 +30,20 @@ reg [31:0] 	prev_dest;
 reg [127:0] prev_text;
 
 always_ff @ (posedge HCLK, negedge HRESETn) begin
-  if (HRESETn == 1'b1) begin // If selected and not being reset
-    prev_HADDR <= HADDR;
-    prev_key   <= key;
-    prev_nonce <= nonce;
-    prev_dest  <= destination;
-    prev_text  <= plain_text;
-    state <= nextState;
-  end else begin // Else if being reset and/or not currently selected
+  if (HRESETn == 1'b0) begin // If selected and not being reset
     state <= S1;
     prev_HADDR <= 32'b0;
     prev_key 	 <= 128'b0;
     prev_nonce <= 128'b0;
     prev_dest  <= 32'b0;
     prev_text  <= 128'b0;
+  end else begin // Else if being reset and/or not currently selected
+  	prev_HADDR <= HADDR;
+    prev_key   <= key;
+    prev_nonce <= nonce;
+    prev_dest  <= destination;
+    prev_text  <= plain_text;
+    state <= nextState;
   end
 
 end
