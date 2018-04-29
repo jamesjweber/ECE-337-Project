@@ -1,6 +1,6 @@
 module ahb_lite_master_interface (
   input wire HCLK,
-	input wire HRESETn,
+  input wire HRESETn,
   input wire HREADY,
   input wire HRESP,
   input wire [31:0] HRDATA,
