@@ -5,7 +5,7 @@
 module tb_ahb_lite_slave_interface();
 
 // Define parameters
-localparam	CLK_PERIOD		= 2.5;
+localparam	CLK_PERIOD		= 10.0;
 localparam 	AHB_BUS_SIZE 	= 32;
 
 // Shared Test Variables
@@ -68,7 +68,7 @@ ahb_lite_slave_interface DUT(
 initial
 begin
   // Initialize all of the test inputs
-  tb_HRESETn 		= 1'b1;		// Initially set high (reset)
+  tb_HRESETn 		= 1'b0;		// Initially set high (reset)
   tb_HSELx			= 1'b1; 	// Initially selected
   tb_HADDR			= 32'b0; 	// Inital address of 0x0'
   tb_HBURST			= 3'b0;		// Single Burst
@@ -88,7 +88,7 @@ begin
   tb_test_num += 1;
   tb_test_case = 	"Initial Reset (S1)";
 
-  tb_HRESETn = 1'b0;
+  tb_HRESETn = 1'b1;
 
   @(posedge tb_HCLK)
 
