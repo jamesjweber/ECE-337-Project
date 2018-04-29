@@ -5,7 +5,7 @@
 module tb_ahb_lite_master_interface();
 
   // Define parameters
-  localparam	CLK_PERIOD		= 2.5;
+  localparam	CLK_PERIOD		= 10.0;
   localparam 	AHB_BUS_SIZE 	= 32;
 
   // Shared Test Variables
@@ -60,7 +60,7 @@ module tb_ahb_lite_master_interface();
   initial
   begin
     // Initialize all of the test inputs
-    tb_HRESETn      = 1'b1;		// Initialize to be inactive
+    tb_HRESETn      = 1'b0;		// Initialize to be inactive
     tb_HREADY		    = 1'b1; 	// Initialize to be high (ready)
     tb_HRESP 	      = 1'b0;		// Initialize to be low (no errors)
     tb_HRDATA       = 32'b0;  // No data being read in
@@ -78,7 +78,7 @@ module tb_ahb_lite_master_interface();
     tb_test_num += 1;
     tb_test_case = "Initial Reset";
 
-    tb_HRESETn = 0;	// set reset (active low)
+    tb_HRESETn = 1;	// set reset (active low)
     @(posedge tb_HCLK)
 
     if (tb_HADDR == '0 && tb_HWRITE == 1'b0) begin

@@ -16,12 +16,12 @@ wire valid;
 
 assign valid = enable && ~HRESETn;
 
-always_ff @ (posedge HCLK, posedge valid) begin 
+always_ff @ (posedge HCLK, posedge valid) begin
   if (valid == 1'b1) begin
      state <= next_state;
      $display("clk");
   end else begin
-    state <= TL; // If disabled, state is transfer low (HREADY and HRESP = 0)
+    state <= TL; // If disabled, state is transfer low (HREADYOUT and HRESP = 0)
   	$display("clk");
   end
 end
