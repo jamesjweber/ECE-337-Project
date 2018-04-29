@@ -13,6 +13,7 @@ reg [127:0] dataMinus1;
 reg [127:0] dataMinus2;
 reg [127:0] dataMinus3;
 reg [4:0] prevCount;
+	
 always_ff @ (posedge clk)
 begin
 	prevCount <= count;

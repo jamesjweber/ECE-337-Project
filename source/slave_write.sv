@@ -30,7 +30,7 @@ reg [31:0] 	prev_dest;
 reg [127:0] prev_text;
 
 always_ff @ (posedge HCLK, negedge HRESETn) begin
-  if (HRESETn == 1'b0) begin // If selected and not being reset
+  if (HRESETn == 1'b1) begin // If selected and not being reset
     prev_HADDR <= HADDR;
     prev_key   <= key;
     prev_nonce <= nonce;
