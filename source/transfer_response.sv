@@ -12,12 +12,8 @@ typedef enum bit [1:0] {TL, TH, ERR1, ERR2} stateType;
   stateType state;
   stateType next_state;
 
-wire valid;
-
-assign valid = enable && ~HRESETn;
-
-always_ff @ (posedge HCLK, posedge valid) begin 
-  if (valid == 1'b1) begin
+always_ff @ (posedge HCLK, negedge HRESETn) begin
+  if (HRESETn == 1'b1) begin
      state <= next_state;
      $display("clk");
   end else begin

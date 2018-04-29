@@ -39,7 +39,7 @@ reg [127:0] next_encr_text_4;
 
 
 always_ff @ (posedge HCLK, negedge HRESETn) begin
-  if (HRESETn == 1'b0) begin
+  if (HRESETn == 1'b1) begin
   	dest <= next_dest;
     encr_text_1 <= next_encr_text_1;
     encr_text_2 <= next_encr_text_2;
@@ -77,7 +77,7 @@ always_comb begin
 	next_dest					= dest;
 
   // HREADY, HRESP
-  
+
   if (dest_updated) begin
   	next_dest = destination;
   end
