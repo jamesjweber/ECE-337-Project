@@ -60,7 +60,7 @@ always_ff @ (posedge HCLK, negedge HRESETn) begin
   end
 end
 
-always_comb begin
+always @(negedge HCLK) begin
 
   // Defaults
   HWRITE = 1'b1;   // Write
