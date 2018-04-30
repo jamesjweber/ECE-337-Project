@@ -5,7 +5,7 @@
 module tb_ahb_lite_slave_interface();
 
 // Define parameters
-localparam	CLK_PERIOD		= 10.0;
+localparam	CLK_PERIOD		= 5.0;
 localparam 	AHB_BUS_SIZE 	= 32;
 
 // Shared Test Variables
@@ -76,6 +76,7 @@ begin
   tb_HREADY			= 1'b1;		// Initially Ready
   tb_fifo_full	= 1'b0;		// FIFO not full
   tb_HWDATA			=	32'b0;	// Empty data initially
+  tb_HSIZE			= 3'b10;	// Size is word
 
   tb_test_num = 0;
   tb_test_case = "Test bench initializaton";
