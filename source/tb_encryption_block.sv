@@ -1,13 +1,3 @@
-// 337 TA Provided Lab 2 Testbench
-// This code serves as a starer test bench for the synchronizer design
-// STUDENT: Replace this message and the above header section with an
-// appropriate header based on your other code files
-
-// 0.5um D-FlipFlop Timing Data Estimates:
-// Data Propagation delay (clk->Q): 670ps
-// Setup time for data relative to clock: 190ps
-// Hold time for data relative to clock: 10ps
-
 `timescale 1ns / 10ps
 
 module tb_encryption_block();
@@ -58,16 +48,16 @@ module tb_encryption_block();
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		@(posedge tb_clk);
-		tb_keyIn = 127'b0;
-		tb_nonceIn = 127'b0;
+		tb_keyIn = 127'b0; //key of 16 '0'
+		tb_nonceIn = 127'b0; //nonce of 16 '0'
 		tb_keySelect = 3'b011;
-		tb_encSelect = 3'b000;
+		tb_encSelect = 3'b000; 
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		tb_rst = 1'b0;
-		@(posedge tb_clk);		
+		@(posedge tb_clk); //8 clocks to prime key block		
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		@(posedge tb_clk);
@@ -80,7 +70,7 @@ module tb_encryption_block();
 		tb_keyLock = 0;
 		tb_go = 1;
 		tb_keySelect = tb_keySelect - 1; 	
-		@(posedge tb_clk);		
+		@(posedge tb_clk); //and then 4 for every subsequent set. These lines repeat until end of test bench
 		@(posedge tb_clk);
 		@(posedge tb_clk);
 		tb_keyLock = 1;
@@ -375,7 +365,7 @@ module tb_encryption_block();
 		@(posedge tb_clk);
 		tb_keyLock = 0;
 		tb_go = 0;
-		tb_pText = 128'hFFFF;
+		tb_pText = 128'hFFFF; //these lines don't match up, but are tested in the top level when the signalling actually occurs.
 		@(posedge tb_clk);	
 		tb_pText = 128'hF00F;	
 		@(posedge tb_clk);
