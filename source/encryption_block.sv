@@ -74,7 +74,6 @@ encryption_end ee(
 	.pText(pText),
 	.prbs(prbs),
 	.count(count),
-	.done(done),
 	.dataOut(encText)
 );
 endmodule
