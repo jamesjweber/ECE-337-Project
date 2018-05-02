@@ -14,7 +14,7 @@ module serpent_fsm
 typedef enum bit [3:0] {IDLE, START, R0, R1, R2, R3, R4, R5, R6, NR7, FR7, END} stateType;
 stateType state;
 stateType nextState;
-reg [2:0] tick;
+reg [2:0] tick; //Start must be held for 8 clocks, Every other active state for four. Allows for precise timing
 reg [2:0] newTick;
 reg [2:0] nsBoxSelect;
 reg [2:0] nkeyBoxSelect;
@@ -51,7 +51,7 @@ begin
 	nkeyBoxSelect = keyBoxSelect;
 	newTick = tick + 1;
 	case(state)
-	IDLE:begin
+	IDLE:begin //Self-explanitory
 		keyLock = 0;
 		fsmGo = 0;
 		nround = 5'b0;
@@ -68,7 +68,7 @@ begin
 			nextState = IDLE;
 		end
 	end
-	START:begin
+	START:begin //Primes the key-blocks, allows keys to generate
 		keyLock = 0;
 		if(tick == 7)
 		begin
@@ -80,14 +80,14 @@ begin
 			nextState = START;
 		end
 	end
-	R0:begin
+	R0:begin //Each set of 8 rounds iterates through all 8 s-boxes. R0-5 are identical. R6 must split between the normal round 7 and the final round 7
 		keyLock = 0;
 		if(tick == 0)
 		begin
 			keyLock = 1;
 			nextState = R0;
 		end
-		else if(tick == 1)
+		else if(tick == 1) //Starts encryption
 		begin
 			fsmGo = 1;
 			nextState = R0;
@@ -258,7 +258,7 @@ begin
 			
 		end
 	end
-	FR7:begin
+	FR7:begin 
 		keyLock = 0;
 		if(tick == 0)
 		begin
@@ -279,7 +279,7 @@ begin
 			
 		end
 	end
-	END:begin
+	END:begin //After final round, dump now-encrypted text to AHB
 		keyLock = 0;
 		done = 1;
 		if(tick == 3)
