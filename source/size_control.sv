@@ -6,6 +6,11 @@ module size_control (
 	output reg ERROR
 );
 
+// This block simply changes the size of the incoming
+// HWDATA depending on HSIZE. It pads with zeros if
+// The size is smaller than 32 bits, it raises an error
+// if it is larger than 32 bits.
+	
 always_comb begin
 
 	SWDATA = 32'b0;
