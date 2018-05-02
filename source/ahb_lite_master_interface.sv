@@ -39,7 +39,7 @@ reg [127:0] next_encr_text_4;
 
 
 always_ff @ (posedge HCLK, negedge HRESETn) begin
-  if (HRESETn == 1'b0) begin
+	if (HRESETn == 1'b0) begin // resets internal registers
   	dest <= 32'b0;
     encr_text_1 <= 128'b0;
     encr_text_2 <= 128'b0;
@@ -48,7 +48,7 @@ always_ff @ (posedge HCLK, negedge HRESETn) begin
     HWDATA <= 32'b0;
     HADDR <= 32'b0;
     state <= IDLE;
-  end else begin
+  end else begin	// default next signals for internal registers
   	dest <= next_dest;
     encr_text_1 <= next_encr_text_1;
     encr_text_2 <= next_encr_text_2;
@@ -68,6 +68,7 @@ always @(negedge HCLK) begin
   HBURST = 3'b111; // 16-beat incr burst
   HTRANS = 2'b0;   // IDLE
 
+	// Set defaults to avoid latches
 	next_encr_text_1	=	encr_text_1;
 	next_encr_text_2	= encr_text_2;
 	next_encr_text_3	= encr_text_3;
@@ -76,8 +77,7 @@ always @(negedge HCLK) begin
 	next_state 				=	state;
 	next_dest					= dest;
 
-  // HREADY, HRESP
-
+	// Update destination
   if (dest_updated) begin
   	next_dest = destination;
   end
@@ -85,14 +85,15 @@ always @(negedge HCLK) begin
   casez (state)
     IDLE:
     begin
-      //if (HREADY == 1'b1 && HRESP == 1'b0) begin
-        if (text_rcvd == 1'b1) begin
-          next_state = LOAD1;
-        end
-        HWRITE = 1'b0;
-      //end
+			// Wait until text is recieved to move out of IDLE state
+			if (text_rcvd == 1'b1) begin
+				next_state = LOAD1;
+			end
+			HWRITE = 1'b0;
     end
 
+		// Once out of IDLE, the following four states, load four 128-bit chunks of data
+		
     LOAD1:
     begin
       //if (HREADY == 1'b1 && HRESP == 1'b0) begin
@@ -124,6 +125,9 @@ always @(negedge HCLK) begin
         next_state = NONSEQ;
       //end
     end
+		
+		// Once data is loaded and saved internally, it is output
+		// a 16-burst mode AHB-Lite protocol.
 
     NONSEQ:
     begin
