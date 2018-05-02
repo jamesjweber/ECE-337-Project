@@ -1,4 +1,4 @@
-module round_start
+module round_start // Four blocks in parallel
 (
 	input wire clk,
 	input wire rst,
@@ -15,14 +15,14 @@ reg [127:0] dataMinus3;
 
 always_ff @ (posedge clk)
 begin
-	if (rst == 1)
+	if (rst == 1) //Loads nonces
 	begin
 		currentData <= freshData;
 		dataMinus1 <= freshData + 1;
 		dataMinus2 <= freshData + 2;
 		dataMinus3 <= freshData + 3;
 	end
-	else if (go == 1)
+	else if (go == 1) //Shift data out while accepting new data
 	begin
 		currentData <= dataMinus1;
 		dataMinus1 <= dataMinus2;
@@ -30,7 +30,7 @@ begin
 		dataMinus3 <= priorRound;
 	end
 	else
-	begin
+	begin //hold current data until go or reset
 		currentData <= currentData;
 		dataMinus1 <= dataMinus1;
 		dataMinus2 <= dataMinus2;
