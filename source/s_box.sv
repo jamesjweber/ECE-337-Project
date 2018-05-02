@@ -1,3 +1,5 @@
+// Vertial substitution. Transposed operation of enc_sub.
+
 module s_box
 (
 	input wire [2:0] sel,
@@ -5,13 +7,15 @@ module s_box
 	output wire [127:0] outData
 );
 
-	reg [127:0] out;
-	reg [7:0] i;
+	reg [127:0] out; // Temporary output.
+	integer i; // Counter variable.
 
 	always_comb
 	begin
+		// For each vertical slice of bits.
 		for(i = 0; i < 32; i += 1)
-			case ({sel, inData[i+96], inData[i+64], inData[i+32], inData[i]})
+			case ({sel, inData[i+96], inData[i+64], inData[i+32], inData[i]}) // Parse round selection and input data.
+				// Round 1.
 				7'h00: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
 				7'h01: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
 				7'h02: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
@@ -29,6 +33,7 @@ module s_box
 				7'h0E: {out[i+96], out[i+64], out[i+32], out[i]} = 9;
 				7'h0F: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
 
+				// Round 2.
 				7'h10: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
 				7'h11: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
 				7'h12: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
@@ -46,6 +51,7 @@ module s_box
 				7'h1E: {out[i+96], out[i+64], out[i+32], out[i]} = 3;
 				7'h1F: {out[i+96], out[i+64], out[i+32], out[i]} = 4;
 
+				// Round 3.
 				7'h20: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
 				7'h21: {out[i+96], out[i+64], out[i+32], out[i]} = 6;
 				7'h22: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
@@ -63,6 +69,7 @@ module s_box
 				7'h2E: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
 				7'h2F: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
 
+				// Round 4.
 				7'h30: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
 				7'h31: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
 				7'h32: {out[i+96], out[i+64], out[i+32], out[i]} = 11;
@@ -80,6 +87,7 @@ module s_box
 				7'h3E: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
 				7'h3F: {out[i+96], out[i+64], out[i+32], out[i]} = 14;
 
+				// Round 5.
 				7'h40: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
 				7'h41: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
 				7'h42: {out[i+96], out[i+64], out[i+32], out[i]} = 8;
@@ -97,6 +105,7 @@ module s_box
 				7'h4E: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
 				7'h4F: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
 
+				// Round 6.
 				7'h50: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
 				7'h51: {out[i+96], out[i+64], out[i+32], out[i]} = 5;
 				7'h52: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
@@ -114,6 +123,7 @@ module s_box
 				7'h5E: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
 				7'h5F: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
 
+				// Round 7.
 				7'h60: {out[i+96], out[i+64], out[i+32], out[i]} = 7;
 				7'h61: {out[i+96], out[i+64], out[i+32], out[i]} = 2;
 				7'h62: {out[i+96], out[i+64], out[i+32], out[i]} = 12;
@@ -131,6 +141,7 @@ module s_box
 				7'h6E: {out[i+96], out[i+64], out[i+32], out[i]} = 10;
 				7'h6F: {out[i+96], out[i+64], out[i+32], out[i]} = 0;
 
+				// Round 8.
 				7'h70: {out[i+96], out[i+64], out[i+32], out[i]} = 1;
 				7'h71: {out[i+96], out[i+64], out[i+32], out[i]} = 13;
 				7'h72: {out[i+96], out[i+64], out[i+32], out[i]} = 15;
@@ -150,6 +161,7 @@ module s_box
 			endcase
 	end
 	
+	// Assign output data.
 	assign outData = out;
 
 endmodule
