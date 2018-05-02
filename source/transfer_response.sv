@@ -7,6 +7,9 @@ module transfer_response (
   output reg HREADYOUT,
   output reg HRESP
 );
+	
+// Given input signals ready and error (a combination of error/ready signals from other blocks)
+// This block raises the appropriate HREADYOUT/HRESP signals
 
 typedef enum bit [1:0] {TL, TH, ERR1, ERR2} stateType;
   stateType state;
@@ -53,7 +56,7 @@ always_comb begin
       HRESP = 1'b1;
     end
 
-    ERR2: // Error repsone, cycle 1
+    ERR2: // Error repsone, cycle 2
     begin
       // Set State
       next_state = ready ? TH : TL;
