@@ -2,15 +2,15 @@ module encryption_block
 (
 	input wire clk,
 	input wire rst,
-	input wire keyLock,
-	input wire fsmGo,
-	input wire [2:0] keySelect,
-	input wire [2:0] encSelect,
+	input wire keyLock, //signal to hold keys
+	input wire fsmGo, //signal to start encryption from FSM
+	input wire [2:0] keySelect, //S-box select for round keys
+	input wire [2:0] encSelect, //S-box select for encryption
 	input wire [4:0] count,
 	input wire [127:0] keyIn,
 	input wire [127:0] nonceIn,
 	input wire [127:0] pText,
-	output wire done,
+	output wire done, //tells AHB master to prepare for output
 	output wire [127:0] encText
 );
 wire [127:0] nrKey;
@@ -19,7 +19,7 @@ wire [127:0] lMixOut;
 wire [127:0] sBoxOut;
 wire [127:0] nkeyMixOut;
 wire [127:0] roundStartOut;
-wire [127:0] prbs;
+	wire [127:0] prbs; //pseudo-random byte stream
 
 round_start rs(
 	.clk(clk),
@@ -46,7 +46,7 @@ enc_sub sb(
 	.outData(sBoxOut)
 );
 
-linear_mix lm(
+	linear_mix lm( //A-D corresponded to newA-newD. See serpent linear mixing diagram. 
 	.A(sBoxOut[127:96]),
 	.B(sBoxOut[95:64]),
 	.C(sBoxOut[63:32]),
