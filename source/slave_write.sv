@@ -54,7 +54,7 @@ end
 
 always @(negedge HCLK) begin
 
-	
+	// Set defaults to avoid latches
 	nextState = state;
   key = prev_key;
   nonce = prev_nonce;
@@ -64,7 +64,7 @@ always @(negedge HCLK) begin
   write_ready = 1'b1;
   write_out = 1'b0;
   
-
+	// Select state depending on HTRANS
   if (HTRANS == 2'b0) begin
   	nextState = S1;
   end else if (HTRANS == 2'b1) begin
@@ -177,52 +177,12 @@ always @(negedge HCLK) begin
       write_error = 1'b1;
     end
 
+		// All other possible states ignored.
+		
     default: nextState = S1;
 
   endcase
 
 end
-
-/* task convert;
-input reg [4:0] numeric_state;
-output stateType nstate;
-begin
-	case (numeric_state)
-    5'b00000: nstate = S1;
-    5'b00001: nstate = S2;
-    5'b00010: nstate = S3;
-    5'b00011: nstate = S4;
-    5'b00100: nstate = S5;
-    5'b00101: nstate = S6;
-    5'b00110: nstate = S7;
-    5'b00111: nstate = S8;
-    5'b01000: nstate = S9;
-    5'b01001: nstate = S10;
-    5'b01010: nstate = S11;
-    5'b01011: nstate = S12;
-    5'b01100: nstate = S13;
-    5'b01101: nstate = S14;
-    5'b01110: nstate = S15;
-    5'b01111: nstate = S16;
-    5'b10000: nstate = S17;
-    5'b10001: nstate = S18;
-    5'b10010: nstate = S19;
-    5'b10011: nstate = S20;
-    5'b10100: nstate = S21;
-    5'b10101: nstate = S22;
-    5'b10110: nstate = S23;
-    5'b10111: nstate = S24;
-    5'b11000: nstate = S25;
-    5'b11001: nstate = S26;
-    5'b11010: nstate = S27;
-    5'b11011: nstate = S28;
-    5'b11100: nstate = S29;
-    5'b11101: nstate = S30;
-    5'b11110: nstate = S31;
-    5'b11111: nstate = S32;
-    default: nstate = S1;
-	endcase
-end
-endtask */
 
 endmodule // slave_write
