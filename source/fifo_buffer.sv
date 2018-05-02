@@ -10,13 +10,13 @@ module fifo_buffer
 	output wire full
 );
 
-	reg [127:0] out;
-	reg [127:0] buffer [7:0];
-	reg [2:0] curr_read, next_read;
-	reg [2:0] curr_write, next_write;
-	reg curr_empty, next_empty, curr_full, next_full;
+	reg [127:0] out; // Temporary output data.
+	reg [127:0] buffer [7:0]; // Buffer memory array.
+	reg [2:0] curr_read, next_read; // Read data pointers.
+	reg [2:0] curr_write, next_write; // Write data pointers.
+	reg curr_empty, next_empty, curr_full, next_full; // Status flags.
 
-	// Control state using flip-flop logic.
+	// Control state and data using flip-flop logic.
 	always_ff @(posedge clk, negedge nRst)
 	begin : FF_LOGIC
 		if(nRst == 1'b0)
@@ -44,6 +44,7 @@ module fifo_buffer
 
 	always_comb
 	begin
+		// Default pointer values.
 		next_read = curr_read;
 		next_write = curr_write;
 		next_empty = curr_empty;
