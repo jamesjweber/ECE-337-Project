@@ -55,6 +55,7 @@ module fifo_buffer
 				begin
 					if(~empty)
 					begin
+						// Update flags and pointers for a read.
 						next_read = curr_read + 1;
 						next_full = 1'b0;
 						next_empty = curr_read + 1 == curr_write ? 1'b1 : next_empty;
@@ -64,6 +65,7 @@ module fifo_buffer
 				begin
 					if(~full)
 					begin
+						// Update flags and pointers for a write.
 						next_write = curr_write + 1;
 						next_empty = 1'b0;
 						next_full = curr_write + 1 == curr_read ? 1'b1 : next_full;
@@ -71,6 +73,7 @@ module fifo_buffer
 				end
 			2'b11: // Read and write simultaneously.
 				begin
+					// Update pointers only, no flag updates for simultaneous.
 					next_read = curr_read + 1;
 					next_write = curr_write + 1;
 				end
