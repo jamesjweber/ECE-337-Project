@@ -8,7 +8,7 @@ module key_storage
 reg [127:0] currentData;
 always_ff @ (posedge clk)
 begin
-	if (keyLock == 1)
+	if (keyLock == 1) //load new key when keyLock goes high
 	begin
 		currentData <= in;
 	end
