@@ -7,7 +7,7 @@
 source init.tcl
 
 # Create Floorplan
-floorplan -r 1.0 0.6 50 50 50 50
+floorplan -r 1.0 0.6 75 50 75 50
 unfixAllIos
 legalizePin
 
@@ -21,7 +21,7 @@ placeDesign -inPlaceOpt
 checkPlace
 
 # If design is congested, try
-#setPlaceMode congEffort high
+# setPlaceMode congEffort high
 
 
 # Route power nets
