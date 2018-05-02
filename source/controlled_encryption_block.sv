@@ -18,12 +18,12 @@ wire [4:0] round;
 
 serpent_fsm fsm(
 	.clk(clk),
-	.go(go),
+	.go(go), //tells FSM to start, as AHB-lite has loaded or promised to load all requisite in time. 
 	.sBoxSelect(encSelect),
 	.keyBoxSelect(keySelect),
-	.done(done),
+	.done(done), //tells AHB-master to expect new data imminently
 	.round(round),
-	.fsmGo(fsmGo),
+	.fsmGo(fsmGo), //tells encryptor to start encrypting data
 	.rst(rst),
 	.keyLock(keyLock)
 );
