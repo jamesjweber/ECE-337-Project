@@ -20,7 +20,7 @@ reg [31:0] pKeyMinus8;
 
 always_ff @ (posedge clk)
 begin
-	if(rst == 1)
+	if(rst == 1) //Pad key out to 256 bits per Serpent spec
 	begin
 		pKeyMinus8 <= keyIn[31:0];
 		pKeyMinus7 <= keyIn[63:32];	
@@ -44,8 +44,8 @@ begin
 	end
 end
 
-assign gen_preKeys = {pKeyMinus8, pKeyMinus5, pKeyMinus3, pKeyMinus1};
-assign pre_froundKeys = {pKeyMinus1, pKeyMinus2, pKeyMinus3, pKeyMinus4};
-assign pre_roundKeys = {pKeyMinus5, pKeyMinus6, pKeyMinus7, pKeyMinus8};
+assign gen_preKeys = {pKeyMinus8, pKeyMinus5, pKeyMinus3, pKeyMinus1}; //prekeys to generate new prekeys
+assign pre_froundKeys = {pKeyMinus1, pKeyMinus2, pKeyMinus3, pKeyMinus4}; //prekeys to generate the current round key
+assign pre_roundKeys = {pKeyMinus5, pKeyMinus6, pKeyMinus7, pKeyMinus8}; //prekeys to generate the final round key
 
 endmodule
