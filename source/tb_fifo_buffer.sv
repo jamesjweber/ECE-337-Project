@@ -13,6 +13,7 @@ module tb_fifo_buffer();
 	wire tb_empty;
 	wire tb_full;
 
+	// Define clock period info.
 	always
 	begin
 		tb_clk = 1'b0;
@@ -21,6 +22,7 @@ module tb_fifo_buffer();
 		#(CLK_PERIOD/2.0);
 	end
 
+	// Define port map.
 	fifo_buffer DUT(.clk(tb_clk),
 			.nRst(tb_nRst),
 			.read(tb_read),
