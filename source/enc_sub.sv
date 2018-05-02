@@ -1,3 +1,5 @@
+// Horizontal substitution. Transposed operation of s_box.
+
 module enc_sub
 (
 	input wire [2:0] sel,
@@ -5,13 +7,15 @@ module enc_sub
 	output wire [127:0] outData
 );
 
-	reg [127:0] out;
-	reg [7:0] i;
+	reg [127:0] out; // Temporary output.
+	integer i; // Counter variable.
 
 	always_comb
 	begin
+		// For each segment of 4 bits.
 		for(i = 3; i < 128; i += 4)
-			case ({sel, inData[i-:4]})
+			case ({sel, inData[i-:4]}) // Parse round selection and input data.
+				// Round 1.
 				7'h00: out[i-:4] = 3;
 				7'h01: out[i-:4] = 8;
 				7'h02: out[i-:4] = 15;
@@ -29,6 +33,7 @@ module enc_sub
 				7'h0E: out[i-:4] = 9;
 				7'h0F: out[i-:4] = 12;
 
+				// Round 2.
 				7'h10: out[i-:4] = 15;
 				7'h11: out[i-:4] = 12;
 				7'h12: out[i-:4] = 2;
@@ -46,6 +51,7 @@ module enc_sub
 				7'h1E: out[i-:4] = 3;
 				7'h1F: out[i-:4] = 4;
 
+				// Round 3.
 				7'h20: out[i-:4] = 8;
 				7'h21: out[i-:4] = 6;
 				7'h22: out[i-:4] = 7;
@@ -63,6 +69,7 @@ module enc_sub
 				7'h2E: out[i-:4] = 5;
 				7'h2F: out[i-:4] = 2;
 
+				// Round 4.
 				7'h30: out[i-:4] = 0;
 				7'h31: out[i-:4] = 15;
 				7'h32: out[i-:4] = 11;
@@ -80,6 +87,7 @@ module enc_sub
 				7'h3E: out[i-:4] = 5;
 				7'h3F: out[i-:4] = 14;
 
+				// Round 5.
 				7'h40: out[i-:4] = 1;
 				7'h41: out[i-:4] = 15;
 				7'h42: out[i-:4] = 8;
@@ -97,6 +105,7 @@ module enc_sub
 				7'h4E: out[i-:4] = 7;
 				7'h4F: out[i-:4] = 13;
 
+				// Round 6.
 				7'h50: out[i-:4] = 15;
 				7'h51: out[i-:4] = 5;
 				7'h52: out[i-:4] = 2;
@@ -114,6 +123,7 @@ module enc_sub
 				7'h5E: out[i-:4] = 7;
 				7'h5F: out[i-:4] = 1;
 
+				// Round 7.
 				7'h60: out[i-:4] = 7;
 				7'h61: out[i-:4] = 2;
 				7'h62: out[i-:4] = 12;
@@ -131,6 +141,7 @@ module enc_sub
 				7'h6E: out[i-:4] = 10;
 				7'h6F: out[i-:4] = 0;
 
+				// Round 8.
 				7'h70: out[i-:4] = 1;
 				7'h71: out[i-:4] = 13;
 				7'h72: out[i-:4] = 15;
@@ -150,6 +161,7 @@ module enc_sub
 			endcase
 	end
 	
+	// Assign output data.
 	assign outData = out;
-
+	
 endmodule
